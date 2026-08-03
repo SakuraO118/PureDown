@@ -1,6 +1,6 @@
 import type { FormatOption } from '@sakuradown/shared'
 import { cn } from '@/lib/utils'
-import { Film, Music, Video } from 'lucide-react'
+import { AlertTriangle, Film, Music, Video } from 'lucide-react'
 
 interface Props {
   formats: FormatOption[]
@@ -56,6 +56,11 @@ export function FormatSelector({ formats, selected, onSelect }: Props) {
             <Icon size={16} className="shrink-0 opacity-60" />
             <span className="flex-1">{f.note || `${f.height}p`}</span>
             <span className="text-xs text-neutral-500">{f.ext}</span>
+            {f.type === 'video-only' && (
+              <span className="text-xs text-amber-600 flex items-center gap-0.5">
+                <AlertTriangle size={10} />无音频
+              </span>
+            )}
             {f.filesize > 0 && (
               <span className="text-xs text-neutral-600">{formatSize(f.filesize)}</span>
             )}
@@ -84,8 +89,8 @@ export function FormatSelector({ formats, selected, onSelect }: Props) {
                 )}
               >
                 <Icon size={16} className="shrink-0 opacity-60" />
-                <span className="flex-1">MP3 音频</span>
-                <span className="text-xs text-neutral-500">mp3</span>
+                <span className="flex-1">{f.note || `${f.ext} 音频`}</span>
+                <span className="text-xs text-neutral-500">{f.ext}</span>
                 {f.filesize > 0 && (
                   <span className="text-xs text-neutral-600">{formatSize(f.filesize)}</span>
                 )}
