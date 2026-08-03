@@ -1,14 +1,15 @@
 import { spawn, execSync } from 'child_process'
+import { createRequire } from 'node:module'
 import type { VideoInfo, FormatOption, PlaylistEntry } from '@sakuradown/shared'
-import ffmpegStatic from 'ffmpeg-static'
 import { existsSync, accessSync, constants } from 'fs'
 
 const YT_DLP = 'yt-dlp'
+const require = createRequire(import.meta.url)
 
 // Resolve ffmpeg path with fallback chain (fastest & most reliable first):
 // 1. System PATH (`brew install ffmpeg` etc.) — fastest check
 // 2. FFMPEG_PATH env var — explicit override
-// 3. ffmpeg-static (bundled by npm) — zero system deps fallback
+// 3. ffmpeg-static (bundled by npm) — zero system deps fallback (lazy-loaded)
 function resolveFfmpeg(): string | null {
   // 1. System PATH first — instant, no network, no binary validation
   try { execSync('ffmpeg -version', { stdio: 'ignore', timeout: 3000 }); return 'ffmpeg' }
@@ -18,11 +19,14 @@ function resolveFfmpeg(): string | null {
   const envPath = process.env.FFMPEG_PATH
   if (envPath && existsSync(envPath)) return envPath
 
-  // 3. ffmpeg-static — check file exists and is executable (no exec to avoid hang)
-  if (ffmpegStatic && existsSync(ffmpegStatic)) {
-    try { accessSync(ffmpegStatic, constants.X_OK); return ffmpegStatic }
-    catch { /* not executable */ }
-  }
+  // 3. ffmpeg-static — lazy-load to avoid blocking startup if not installed
+  try {
+    const ffmpegStatic = require('ffmpeg-static') as string | null
+    if (ffmpegStatic && existsSync(ffmpegStatic)) {
+      try { accessSync(ffmpegStatic, constants.X_OK); return ffmpegStatic }
+      catch { /* not executable */ }
+    }
+  } catch { /* ffmpeg-static not installed (optional dep) */ }
 
   return null
 }
