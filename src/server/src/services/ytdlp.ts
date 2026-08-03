@@ -1,26 +1,29 @@
 import { spawn, execSync } from 'child_process'
 import type { VideoInfo, FormatOption, PlaylistEntry } from '@sakuradown/shared'
 import ffmpegStatic from 'ffmpeg-static'
-import { existsSync } from 'fs'
+import { existsSync, accessSync, constants } from 'fs'
 
 const YT_DLP = 'yt-dlp'
 
-// Resolve ffmpeg path with fallback chain:
-// 1. ffmpeg-static (bundled by npm, zero system deps)
-// 2. System PATH (`brew install ffmpeg` etc.)
-// 3. FFMPEG_PATH env var
+// Resolve ffmpeg path with fallback chain (fastest & most reliable first):
+// 1. System PATH (`brew install ffmpeg` etc.) — fastest check
+// 2. FFMPEG_PATH env var — explicit override
+// 3. ffmpeg-static (bundled by npm) — zero system deps fallback
 function resolveFfmpeg(): string | null {
-  // Check ffmpeg-static first
-  if (ffmpegStatic && existsSync(ffmpegStatic)) {
-    try { execSync(`"${ffmpegStatic}" -version`, { stdio: 'ignore', timeout: 5000 }); return ffmpegStatic }
-    catch { /* ffmpeg-static binary broken or blocked by OS */ }
-  }
-  // Fall back to system PATH
-  try { execSync('ffmpeg -version', { stdio: 'ignore', timeout: 5000 }); return 'ffmpeg' }
+  // 1. System PATH first — instant, no network, no binary validation
+  try { execSync('ffmpeg -version', { stdio: 'ignore', timeout: 3000 }); return 'ffmpeg' }
   catch { /* not in PATH */ }
-  // Fall back to env var
+
+  // 2. Env var override
   const envPath = process.env.FFMPEG_PATH
   if (envPath && existsSync(envPath)) return envPath
+
+  // 3. ffmpeg-static — check file exists and is executable (no exec to avoid hang)
+  if (ffmpegStatic && existsSync(ffmpegStatic)) {
+    try { accessSync(ffmpegStatic, constants.X_OK); return ffmpegStatic }
+    catch { /* not executable */ }
+  }
+
   return null
 }
 
