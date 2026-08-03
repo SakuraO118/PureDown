@@ -1,0 +1,11 @@
+{
+  "name": "sakuradown",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --parallel -r dev",
+    "dev:server": "pnpm --filter @sakuradown/server dev",
+    "dev:web": "pnpm --filter @sakuradown/web dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint"
+  }
+}
