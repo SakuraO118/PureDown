@@ -14,18 +14,12 @@ export async function downloadRoutes(app: FastifyInstance) {
     try {
       // Parse video info first to get the title
       const video = await parseVideo(url)
-      const format = video.formats.find(f => f.id === formatId)
-
-      // Auto-combine best audio stream for video-only formats (DASH)
-      const effectiveFormatId = format?.type === 'video-only'
-        ? `${formatId}+bestaudio[ext=m4a]/bestaudio`
-        : formatId
 
       const task = downloadManager.createTask(
         url,
         video.title,
-        effectiveFormatId,
-        format?.note || formatId
+        formatId,
+        video.formats.find(f => f.id === formatId)?.note || formatId
       )
 
       return reply.send({ taskId: task.id } satisfies DownloadResponse)

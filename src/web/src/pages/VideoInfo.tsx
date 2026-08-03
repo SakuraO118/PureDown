@@ -43,7 +43,13 @@ export default function VideoInfo() {
     if (!selectedFormat) return
     setDownloading(selectedFormat)
     try {
-      const taskId = await startDownload(video.webpageUrl, selectedFormat)
+      // Auto-merge best audio for video-only formats (DASH)
+      const format = video.formats.find(f => f.id === selectedFormat)
+      const downloadFormatId = format?.type === 'video-only'
+        ? `${selectedFormat}+bestaudio[ext=m4a]/bestaudio`
+        : selectedFormat
+
+      const taskId = await startDownload(video.webpageUrl, downloadFormatId)
       trackProgress(taskId)
       toast.success('下载已开始')
     } catch (err) {
