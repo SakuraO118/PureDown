@@ -171,11 +171,17 @@ export function download(
       reject(new Error('FFmpeg 未找到。请安装: brew install ffmpeg'))
       return
     }
+    // Only pass --ffmpeg-location for custom paths; yt-dlp finds system ffmpeg on PATH automatically
+    const ffmpegArgs = isMerging
+      ? (ffmpegPath && ffmpegPath !== 'ffmpeg'
+          ? ['--ffmpeg-location', ffmpegPath, '--merge-output-format', 'mp4']
+          : ['--merge-output-format', 'mp4'])
+      : []
     const args = [
       '-f', formatId,
       '--progress', '--newline',
       '--no-playlist',
-      ...(isMerging && ffmpegPath ? ['--ffmpeg-location', ffmpegPath, '--merge-output-format', 'mp4'] : []),
+      ...ffmpegArgs,
       '-o', outputTemplate,
       url,
     ]
