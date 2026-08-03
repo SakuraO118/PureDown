@@ -136,10 +136,12 @@ export function download(
 ): Promise<{ filePath: string; filename: string }> {
   return new Promise((resolve, reject) => {
     const outputTemplate = `${outputDir}/%(title)s.%(ext)s`
+    const isMerging = formatId.includes('+')
     const args = [
       '-f', formatId,
       '--progress', '--newline',
       '--no-playlist',
+      ...(isMerging ? ['--merge-output-format', 'mp4'] : []),
       '-o', outputTemplate,
       url,
     ]
