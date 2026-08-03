@@ -1,7 +1,30 @@
-import { spawn } from 'child_process'
+import { spawn, execSync } from 'child_process'
 import type { VideoInfo, FormatOption, PlaylistEntry } from '@sakuradown/shared'
+import ffmpegStatic from 'ffmpeg-static'
+import { existsSync } from 'fs'
 
 const YT_DLP = 'yt-dlp'
+
+// Resolve ffmpeg path with fallback chain:
+// 1. ffmpeg-static (bundled by npm, zero system deps)
+// 2. System PATH (`brew install ffmpeg` etc.)
+// 3. FFMPEG_PATH env var
+function resolveFfmpeg(): string | null {
+  // Check ffmpeg-static first
+  if (ffmpegStatic && existsSync(ffmpegStatic)) {
+    try { execSync(`"${ffmpegStatic}" -version`, { stdio: 'ignore', timeout: 5000 }); return ffmpegStatic }
+    catch { /* ffmpeg-static binary broken or blocked by OS */ }
+  }
+  // Fall back to system PATH
+  try { execSync('ffmpeg -version', { stdio: 'ignore', timeout: 5000 }); return 'ffmpeg' }
+  catch { /* not in PATH */ }
+  // Fall back to env var
+  const envPath = process.env.FFMPEG_PATH
+  if (envPath && existsSync(envPath)) return envPath
+  return null
+}
+
+const ffmpegPath = resolveFfmpeg()
 
 function exec(args: string[]): Promise<{ stdout: string; stderr: string }> {
   return new Promise((resolve, reject) => {
@@ -137,11 +160,15 @@ export function download(
   return new Promise((resolve, reject) => {
     const outputTemplate = `${outputDir}/%(title)s.%(ext)s`
     const isMerging = formatId.includes('+')
+    if (isMerging && !ffmpegPath) {
+      reject(new Error('FFmpeg 未找到。请安装: brew install ffmpeg'))
+      return
+    }
     const args = [
       '-f', formatId,
       '--progress', '--newline',
       '--no-playlist',
-      ...(isMerging ? ['--merge-output-format', 'mp4'] : []),
+      ...(isMerging && ffmpegPath ? ['--ffmpeg-location', ffmpegPath, '--merge-output-format', 'mp4'] : []),
       '-o', outputTemplate,
       url,
     ]
