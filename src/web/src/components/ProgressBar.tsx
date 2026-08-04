@@ -20,7 +20,7 @@ export function ProgressBar({ percent, className, showLabel = true, size = 'sm' 
         />
       </div>
       {showLabel && (
-        <span className="text-xs font-mono text-warm-500 mt-1 tabular-nums">
+        <span className="block text-xs font-mono text-warm-500 mt-1 tabular-nums">
           {clamped.toFixed(1)}%
         </span>
       )}
