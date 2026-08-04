@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Clock, User, Download, ArrowLeft, Loader2, CheckCircle2 } from 'lucide-react'
+import { Clock, User, Download, Loader2, ArrowLeft, Check } from 'lucide-react'
 import type { VideoInfo as VideoInfoType } from '@sakuradown/shared'
 import { FormatSelector } from '@/components/FormatSelector'
+import { EmptyState } from '@/components/EmptyState'
+import { SkeletonVideoInfo } from '@/components/Skeleton'
 import { useDownload } from '@/hooks/useDownload'
 import { toast } from 'sonner'
 
@@ -11,20 +13,27 @@ export default function VideoInfo() {
   const navigate = useNavigate()
   const { startDownload, trackProgress } = useDownload()
   const [selectedFormat, setSelectedFormat] = useState<string | null>(null)
-  const [downloading, setDownloading] = useState<string | null>(null)
+  const [downloading, setDownloading] = useState(false)
+  const [done, setDone] = useState(false)
 
   // Load video info from sessionStorage
   const raw = sessionStorage.getItem(`video-${id}`)
   if (!raw) {
     return (
-      <div className="max-w-2xl mx-auto pt-32 px-4 text-center">
-        <p className="text-neutral-500">视频信息已过期，请重新解析</p>
-        <button
-          onClick={() => navigate('/')}
-          className="mt-4 text-sakura-400 hover:underline"
-        >
-          返回首页
-        </button>
+      <div className="max-w-3xl mx-auto p-6">
+        <EmptyState
+          icon={ArrowLeft}
+          title="视频信息已过期"
+          description="请返回首页重新解析视频链接"
+          action={
+            <button
+              onClick={() => navigate('/')}
+              className="px-4 py-2 text-sm rounded-md bg-caramel-400 hover:bg-caramel-500 text-white transition-colors"
+            >
+              返回首页
+            </button>
+          }
+        />
       </div>
     )
   }
@@ -41,9 +50,8 @@ export default function VideoInfo() {
 
   const handleDownload = async () => {
     if (!selectedFormat) return
-    setDownloading(selectedFormat)
+    setDownloading(true)
     try {
-      // Auto-merge best audio for video-only formats (DASH)
       const format = video.formats.find(f => f.id === selectedFormat)
       const downloadFormatId = format?.type === 'video-only'
         ? `${selectedFormat}+bestaudio[ext=m4a]/bestaudio`
@@ -51,75 +59,88 @@ export default function VideoInfo() {
 
       const taskId = await startDownload(video.webpageUrl, downloadFormatId)
       trackProgress(taskId)
+      setDone(true)
       toast.success('下载已开始')
     } catch (err) {
       toast.error((err as Error).message || '下载失败')
     } finally {
-      setDownloading(null)
+      setDownloading(false)
     }
   }
 
   return (
     <div className="max-w-3xl mx-auto p-6">
+      {/* Breadcrumb */}
       <button
         onClick={() => navigate('/')}
-        className="flex items-center gap-1 text-neutral-500 hover:text-neutral-300 mb-6 transition-colors"
+        className="inline-flex items-center gap-1 text-sm text-warm-500 hover:text-warm-700 transition-colors mb-6"
       >
-        <ArrowLeft size={16} /> 返回
+        <ArrowLeft size={14} /> 返回
       </button>
 
-      <div className="flex gap-6">
+      <div className="flex flex-col sm:flex-row gap-6">
         {/* Thumbnail */}
-        {video.thumbnail && (
+        {video.thumbnail ? (
           <img
             src={video.thumbnail}
             alt={video.title}
-            className="w-72 rounded-xl object-cover shrink-0"
+            className="w-full sm:w-72 rounded-md shadow-card object-cover shrink-0"
           />
+        ) : (
+          <div className="w-full sm:w-72 h-44 rounded-md bg-warm-100 flex items-center justify-center shrink-0">
+            <span className="text-warm-400 text-sm">无封面</span>
+          </div>
         )}
 
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl font-semibold leading-tight mb-3">{video.title}</h1>
-          <div className="flex items-center gap-4 text-sm text-neutral-400 mb-4">
-            <span className="flex items-center gap-1">
-              <User size={14} /> {video.uploader}
+          {/* Title */}
+          <h1 className="font-display text-xl font-medium text-warm-800 leading-snug mb-3">
+            {video.title}
+          </h1>
+
+          {/* Meta */}
+          <div className="flex items-center gap-4 text-sm text-warm-500 mb-5">
+            <span className="flex items-center gap-1.5">
+              <User size={14} strokeWidth={1.5} />
+              {video.uploader || '未知 UP 主'}
             </span>
             {video.duration > 0 && (
-              <span className="flex items-center gap-1">
-                <Clock size={14} /> {formatDuration(video.duration)}
+              <span className="flex items-center gap-1.5">
+                <Clock size={14} strokeWidth={1.5} />
+                {formatDuration(video.duration)}
               </span>
             )}
           </div>
 
-          {/* Playlist entries */}
+          {/* Playlist summary */}
           {video.isPlaylist && video.entries.length > 0 && (
-            <div className="mb-4">
-              <p className="text-sm text-neutral-500 mb-2">
+            <details className="mb-5">
+              <summary className="text-sm text-warm-500 cursor-pointer hover:text-warm-600 transition-colors select-none">
                 合集 · {video.entries.length} 个视频
-                {video.playlistTitle && ` · ${video.playlistTitle}`}
-              </p>
-              <div className="max-h-40 overflow-y-auto space-y-1 pr-2">
+                {video.playlistTitle && ` — ${video.playlistTitle}`}
+              </summary>
+              <div className="mt-2 max-h-40 overflow-y-auto space-y-0.5 pl-1 border-l-2 border-warm-200">
                 {video.entries.map((entry) => (
                   <div
                     key={entry.id}
-                    className="flex items-center gap-2 text-sm text-neutral-400 py-0.5"
+                    className="flex items-center gap-2 text-sm text-warm-500 py-0.5 pl-2"
                   >
-                    <span className="text-neutral-600 w-6 text-right shrink-0">
+                    <span className="text-warm-400 w-6 text-right shrink-0 text-xs font-mono">
                       {entry.index}.
                     </span>
-                    <span className="truncate">{entry.title}</span>
-                    <span className="text-neutral-600 shrink-0">
+                    <span className="truncate flex-1">{entry.title}</span>
+                    <span className="text-warm-400 shrink-0 text-xs font-mono">
                       {formatDuration(entry.duration)}
                     </span>
                   </div>
                 ))}
               </div>
-            </div>
+            </details>
           )}
 
           {/* Format selector */}
-          <div className="mb-4">
-            <p className="text-sm text-neutral-500 mb-2">选择格式</p>
+          <div className="mb-5">
+            <p className="text-xs font-medium text-warm-500 mb-2 uppercase tracking-wide">选择格式</p>
             <FormatSelector
               formats={video.formats}
               selected={selectedFormat}
@@ -127,20 +148,28 @@ export default function VideoInfo() {
             />
           </div>
 
+          {/* Download button */}
           <button
             onClick={handleDownload}
-            disabled={!selectedFormat || downloading !== null}
-            className="w-full h-11 rounded-xl bg-sakura-500 hover:bg-sakura-600 text-white font-medium
-                       flex items-center justify-center gap-2 transition-all
+            disabled={!selectedFormat || downloading}
+            className="w-full h-11 rounded-md bg-caramel-400 hover:bg-caramel-500 text-white
+                       font-medium text-sm flex items-center justify-center gap-2 transition-colors
                        disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {downloading ? (
               <>
-                <Loader2 size={18} className="animate-spin" /> 开始下载中...
+                <Loader2 size={16} className="animate-spin" />
+                开始下载中…
+              </>
+            ) : done ? (
+              <>
+                <Check size={16} />
+                已添加到队列
               </>
             ) : (
               <>
-                <Download size={18} /> 下载
+                <Download size={16} />
+                下载
               </>
             )}
           </button>

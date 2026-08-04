@@ -24,7 +24,6 @@ function formatSize(bytes: number): string {
 }
 
 export function FormatSelector({ formats, selected, onSelect }: Props) {
-  // Group formats: common resolutions first, then audio-only
   const videoFormats = formats.filter(f => f.type !== 'audio-only')
   const audioFormats = formats.filter(f => f.type === 'audio-only')
 
@@ -38,7 +37,7 @@ export function FormatSelector({ formats, selected, onSelect }: Props) {
   }).sort((a, b) => b.height - a.height)
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-1">
       {deduped.map((f) => {
         const Icon = iconForType(f.type)
         const isSelected = selected === f.id
@@ -47,17 +46,18 @@ export function FormatSelector({ formats, selected, onSelect }: Props) {
             key={f.id}
             onClick={() => onSelect(f.id)}
             className={cn(
-              'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all text-left',
+              'w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-all text-left',
+              'border-l-[3px]',
               isSelected
-                ? 'bg-sakura-500/10 border border-sakura-500/30 text-sakura-300'
-                : 'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:border-neutral-700'
+                ? 'bg-caramel-100 border border-caramel-300 border-l-caramel-400 text-warm-700'
+                : 'bg-white border border-warm-200 border-l-transparent text-warm-600 hover:border-warm-300 hover:bg-warm-50'
             )}
           >
-            <Icon size={16} className="shrink-0 opacity-60" />
-            <span className="flex-1">{f.note || `${f.height}p`}</span>
-            <span className="text-xs text-neutral-500">{f.ext}</span>
+            <Icon size={15} className={cn('shrink-0', isSelected ? 'text-caramel-500' : 'text-warm-400')} />
+            <span className="flex-1 font-medium">{f.note || `${f.height}p`}</span>
+            <span className="text-xs text-warm-400 font-mono">{f.ext}</span>
             {f.filesize > 0 && (
-              <span className="text-xs text-neutral-600">{formatSize(f.filesize)}</span>
+              <span className="text-xs text-warm-400">{formatSize(f.filesize)}</span>
             )}
           </button>
         )
@@ -66,28 +66,32 @@ export function FormatSelector({ formats, selected, onSelect }: Props) {
       {/* Audio-only section */}
       {audioFormats.length > 0 && (
         <>
-          <div className="pt-1">
-            <p className="text-xs text-neutral-600 px-3 py-1">仅音频</p>
+          <div className="pt-3 pb-1">
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-px bg-warm-200" />
+              <span className="text-[11px] text-warm-400 uppercase tracking-wide font-medium">仅音频</span>
+              <div className="flex-1 h-px bg-warm-200" />
+            </div>
           </div>
           {audioFormats.slice(0, 3).map((f) => {
-            const Icon = Music
             const isSelected = selected === f.id
             return (
               <button
                 key={f.id}
                 onClick={() => onSelect(f.id)}
                 className={cn(
-                  'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all text-left',
+                  'w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-all text-left',
+                  'border-l-[3px]',
                   isSelected
-                    ? 'bg-sakura-500/10 border border-sakura-500/30 text-sakura-300'
-                    : 'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:border-neutral-700'
+                    ? 'bg-caramel-100 border border-caramel-300 border-l-caramel-400 text-warm-700'
+                    : 'bg-white border border-warm-200 border-l-transparent text-warm-600 hover:border-warm-300 hover:bg-warm-50'
                 )}
               >
-                <Icon size={16} className="shrink-0 opacity-60" />
-                <span className="flex-1">{f.note || `${f.ext} 音频`}</span>
-                <span className="text-xs text-neutral-500">{f.ext}</span>
+                <Music size={15} className={cn('shrink-0', isSelected ? 'text-caramel-500' : 'text-warm-400')} />
+                <span className="flex-1 font-medium">{f.note || `${f.ext} 音频`}</span>
+                <span className="text-xs text-warm-400 font-mono">{f.ext}</span>
                 {f.filesize > 0 && (
-                  <span className="text-xs text-neutral-600">{formatSize(f.filesize)}</span>
+                  <span className="text-xs text-warm-400">{formatSize(f.filesize)}</span>
                 )}
               </button>
             )
