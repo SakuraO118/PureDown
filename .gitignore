@@ -2,3 +2,7 @@ node_modules
 dist
 *.tsbuildinfo
 specs
+CLAUDE.md
+.DS_Store
+.claude
+
