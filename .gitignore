@@ -1,8 +1,9 @@
-node_modules
-dist
+node_modules/
+dist/
 *.tsbuildinfo
-specs
-CLAUDE.md
+specs/
 .DS_Store
-.claude
 
+# 本地 Claude Code 配置
+.claude/
+CLAUDE.md 
