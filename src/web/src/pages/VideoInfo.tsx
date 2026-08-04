@@ -4,7 +4,6 @@ import { Clock, User, Download, Loader2, ArrowLeft, Check } from 'lucide-react'
 import type { VideoInfo as VideoInfoType } from '@sakuradown/shared'
 import { FormatSelector } from '@/components/FormatSelector'
 import { EmptyState } from '@/components/EmptyState'
-import { SkeletonVideoInfo } from '@/components/Skeleton'
 import { useDownload } from '@/hooks/useDownload'
 import { toast } from 'sonner'
 

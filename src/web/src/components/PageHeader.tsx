@@ -13,6 +13,7 @@ export function PageHeader({ title, breadcrumb, action, className }: Props) {
     <div className={cn('mb-6', className)}>
       {breadcrumb && (
         <button
+          type="button"
           onClick={breadcrumb.onClick}
           className="inline-flex items-center gap-1 text-sm text-warm-500 hover:text-warm-700 transition-colors mb-2"
         >
