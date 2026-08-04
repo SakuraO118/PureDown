@@ -20,10 +20,12 @@ export async function staticRoutes(app: FastifyInstance) {
 
   // SPA fallback: serve index.html for all non-API, non-WS routes
   app.setNotFoundHandler((req, reply) => {
-    if (req.url.startsWith('/api/') || req.url.startsWith('/ws/')) {
+    const isApiOrWs = /^\/(api|ws)(\/|$)/.test(req.url)
+    if (isApiOrWs) return reply.code(404).send({ error: 'Not found' })
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
       return reply.code(404).send({ error: 'Not found' })
     }
-    return reply.sendFile('index.html')
+    return reply.type('text/html').sendFile('index.html')
   })
 
   app.log.info(`Serving static files from ${DIST_DIR}`)
