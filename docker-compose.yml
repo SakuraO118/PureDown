@@ -1,0 +1,15 @@
+services:
+  sakuradown:
+    build: .
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./downloads:/data/downloads
+    environment:
+      - DOWNLOAD_DIR=/data/downloads
+      # ---- 代理配置（国内 VPS 访问 YouTube 需要） ----
+      # 取消注释下面两行并填入你的代理地址:
+      # - HTTP_PROXY=http://host.docker.internal:7890
+      # - HTTPS_PROXY=http://host.docker.internal:7890
+      # - NO_PROXY=localhost,127.0.0.1,::1
+    restart: unless-stopped

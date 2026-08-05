@@ -49,6 +49,7 @@ export interface DownloadTask {
     status: TaskStatus;
     progress: DownloadProgress | null;
     outputPath: string;
+    filename?: string;
     error?: string;
     createdAt: number;
 }
