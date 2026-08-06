@@ -3,7 +3,7 @@ import fastifyStatic from '@fastify/static'
 import { resolve } from 'path'
 import { existsSync } from 'fs'
 
-const DIST_DIR = resolve(import.meta.dirname, '../../web/dist')
+const DIST_DIR = resolve(import.meta.dirname, '../../../web/dist')
 
 export async function staticRoutes(app: FastifyInstance) {
   // Only serve static files in production (when dist/ exists)
