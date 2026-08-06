@@ -6,6 +6,10 @@ import { existsSync, accessSync, constants } from 'fs'
 const YT_DLP = 'yt-dlp'
 const require = createRequire(import.meta.url)
 
+// Cookie file support (for Bilibili anti-bot bypass on datacenter IPs)
+const COOKIES_FILE = process.env.COOKIES_FILE
+const cookieArgs = COOKIES_FILE && existsSync(COOKIES_FILE) ? ['--cookies', COOKIES_FILE] : []
+
 // Resolve ffmpeg path with fallback chain (fastest & most reliable first):
 // 1. System PATH (`brew install ffmpeg` etc.) — fastest check
 // 2. FFMPEG_PATH env var — explicit override
@@ -35,7 +39,7 @@ const ffmpegPath = resolveFfmpeg()
 
 function exec(args: string[]): Promise<{ stdout: string; stderr: string }> {
   return new Promise((resolve, reject) => {
-    const proc = spawn(YT_DLP, args, {
+    const proc = spawn(YT_DLP, [...cookieArgs, ...args], {
       stdio: ['ignore', 'pipe', 'pipe'],
     })
     let stdout = ''
@@ -178,6 +182,7 @@ export function download(
           : ['--merge-output-format', 'mp4'])
       : []
     const args = [
+      ...cookieArgs,
       '-f', formatId,
       '--progress', '--newline',
       '--no-playlist',
