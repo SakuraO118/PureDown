@@ -236,3 +236,37 @@ export function download(
     proc.on('error', reject)
   })
 }
+
+// Stream download: yt-dlp outputs to stdout, piped directly to HTTP response
+export function downloadStream(
+  url: string,
+  formatId: string,
+): { proc: ReturnType<typeof spawn>; filename: string } {
+  const isMerging = formatId.includes('+')
+  if (isMerging && !ffmpegPath) {
+    throw new Error('FFmpeg 未找到。请安装: brew install ffmpeg')
+  }
+  const ffmpegArgs = isMerging
+    ? (ffmpegPath && ffmpegPath !== 'ffmpeg'
+        ? ['--ffmpeg-location', ffmpegPath, '--merge-output-format', 'mp4']
+        : ['--merge-output-format', 'mp4'])
+    : []
+
+  const args = [
+    ...cookieArgs,
+    '-f', formatId,
+    '--no-playlist',
+    ...ffmpegArgs,
+    '-o', '-',  // output to stdout
+    url,
+  ]
+
+  const proc = spawn(YT_DLP, args, {
+    stdio: ['ignore', 'pipe', 'pipe'],  // stdout=video data, stderr=progress
+  })
+
+  // Build a fallback filename from URL
+  const filename = `video_${Date.now()}.mp4`
+
+  return { proc, filename }
+}

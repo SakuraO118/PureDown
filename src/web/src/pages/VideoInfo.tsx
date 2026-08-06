@@ -4,13 +4,12 @@ import { Clock, User, Download, Loader2, ArrowLeft, Check } from 'lucide-react'
 import type { VideoInfo as VideoInfoType } from '@sakuradown/shared'
 import { FormatSelector } from '@/components/FormatSelector'
 import { EmptyState } from '@/components/EmptyState'
-import { useDownload } from '@/hooks/useDownload'
+import { api } from '@/lib/api'
 import { toast } from 'sonner'
 
 export default function VideoInfo() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { startDownload, trackProgress } = useDownload()
   const [selectedFormat, setSelectedFormat] = useState<string | null>(null)
   const [downloading, setDownloading] = useState(false)
   const [done, setDone] = useState(false)
@@ -56,10 +55,19 @@ export default function VideoInfo() {
         ? `${selectedFormat}+bestaudio[ext=m4a]/bestaudio`
         : selectedFormat
 
-      const taskId = await startDownload(video.webpageUrl, downloadFormatId)
-      trackProgress(taskId)
+      // Direct streaming download: yt-dlp stdout → browser (no server storage)
+      const streamUrl = api.getStreamUrl(video.webpageUrl, downloadFormatId)
+
+      // Trigger browser download via hidden anchor
+      const a = document.createElement('a')
+      a.href = streamUrl
+      a.download = ''
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+
       setDone(true)
-      toast.success('下载已开始')
+      toast.success('下载已开始，请查看浏览器下载列表')
     } catch (err) {
       toast.error((err as Error).message || '下载失败')
     } finally {
