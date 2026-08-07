@@ -6,8 +6,9 @@ RUN apk add --no-cache ffmpeg python3 py3-pip && \
 
 WORKDIR /app
 
-# Enable pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Enable pnpm (use npmmirror for China network)
+RUN npm config set registry https://registry.npmmirror.com && \
+    corepack enable && corepack prepare pnpm@latest --activate
 
 # Copy workspace config and lockfile
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
@@ -18,7 +19,8 @@ COPY src/server/package.json src/server/
 COPY src/web/package.json src/web/
 
 # Install dependencies (ffmpeg-static is optional, skip if fails)
-RUN pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile
+RUN pnpm config set registry https://registry.npmmirror.com && \
+    pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile
 
 # Copy source
 COPY src/shared src/shared
