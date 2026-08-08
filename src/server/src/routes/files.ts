@@ -2,6 +2,8 @@ import type { FastifyInstance } from 'fastify'
 import { readdir, stat } from 'fs/promises'
 import { createReadStream } from 'fs'
 import { join } from 'path'
+import { get as httpsGet } from 'https'
+import { get as httpGet } from 'http'
 import { downloadManager } from '../services/download-manager.js'
 
 export async function filesRoutes(app: FastifyInstance) {
@@ -12,19 +14,23 @@ export async function filesRoutes(app: FastifyInstance) {
 
     try {
       const parsed = new URL(url)
-      const client = parsed.protocol === 'https:' ? require('https') : require('http')
+      const isBilibili = /hdslb\.com|bilibili\.com/i.test(parsed.hostname)
+      const referer = isBilibili ? 'https://www.bilibili.com/' : parsed.origin
+      const get = parsed.protocol === 'https:' ? httpsGet : httpGet
       const data = await new Promise<Buffer>((resolve, reject) => {
-        client.get(url, { headers: { Referer: parsed.origin, 'User-Agent': 'PureDown/1.0' } }, (res: any) => {
+        get(url, { headers: { Referer: referer, 'User-Agent': 'Mozilla/5.0' } }, (res: any) => {
           if (res.statusCode && res.statusCode >= 400) return reject(new Error(`HTTP ${res.statusCode}`))
           const chunks: Buffer[] = []
           res.on('data', (c: Buffer) => chunks.push(c))
           res.on('end', () => resolve(Buffer.concat(chunks)))
         }).on('error', reject)
       })
-      reply.header('Content-Type', 'image/jpeg')
+      const ext = parsed.pathname.split('.').pop()?.toLowerCase() || 'jpg'
+      const mimeMap: Record<string, string> = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', webp: 'image/webp' }
+      reply.header('Content-Type', mimeMap[ext] || 'image/jpeg')
       reply.header('Cache-Control', 'public, max-age=86400')
       return reply.send(data)
-    } catch {
+    } catch (err) {
       return reply.status(404).send({ error: 'Image not found' })
     }
   })

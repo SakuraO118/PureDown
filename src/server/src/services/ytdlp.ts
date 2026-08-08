@@ -101,6 +101,7 @@ function parseRawFormat(raw: Record<string, unknown>): FormatOption {
     vcodec,
     acodec,
     asr: (raw.asr as number) || 0,
+    abr: (raw.abr as number) || 0,
     note,
     type,
   }

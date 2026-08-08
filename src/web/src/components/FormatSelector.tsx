@@ -23,10 +23,10 @@ function formatSize(bytes: number): string {
   return `${mb.toFixed(0)} MB`
 }
 
-function formatSampleRate(asr: number): string {
-  if (!asr || asr <= 0) return ''
-  if (asr >= 1000) return `${(asr / 1000).toFixed(1)}kHz`
-  return `${asr}Hz`
+function formatAudioQuality(f: FormatOption): string {
+  if (f.asr > 0) return `${(f.asr / 1000).toFixed(1)}kHz`
+  if (f.abr > 0) return `${Math.round(f.abr)}kbps`
+  return ''
 }
 
 export function FormatSelector({ formats, selected, onSelect }: Props) {
@@ -95,8 +95,8 @@ export function FormatSelector({ formats, selected, onSelect }: Props) {
               >
                 <Music size={15} className={cn('shrink-0', isSelected ? 'text-ocean-500' : 'text-ink-400')} />
                 <span className="flex-1 font-medium">{f.note || `${f.ext} 音频`}</span>
-                {f.asr > 0 && (
-                  <span className="text-xs text-ink-500 font-mono">{formatSampleRate(f.asr)}</span>
+                {formatAudioQuality(f) && (
+                  <span className="text-xs text-ink-500 font-mono">{formatAudioQuality(f)}</span>
                 )}
                 <span className="text-xs text-ink-400 font-mono">{f.ext}</span>
                 {f.filesize > 0 && (
