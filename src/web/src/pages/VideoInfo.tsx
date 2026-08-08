@@ -95,7 +95,7 @@ export default function VideoInfo() {
           </div>
         )}
 
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 max-w-lg">
           {/* Title */}
           <h1 className="font-display text-xl font-medium text-ink-800 leading-snug mb-3">
             {video.title}
