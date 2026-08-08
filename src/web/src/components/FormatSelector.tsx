@@ -94,10 +94,7 @@ export function FormatSelector({ formats, selected, onSelect }: Props) {
                 )}
               >
                 <Music size={15} className={cn('shrink-0', isSelected ? 'text-ocean-500' : 'text-ink-400')} />
-                <span className="flex-1 font-medium">{f.note || `${f.ext} 音频`}</span>
-                {formatAudioQuality(f) && (
-                  <span className="text-xs text-ink-500 font-mono">{formatAudioQuality(f)}</span>
-                )}
+                <span className="flex-1 font-medium">{formatAudioQuality(f) || f.note || 'audio only'}</span>
                 <span className="text-xs text-ink-400 font-mono">{f.ext}</span>
                 {f.filesize > 0 && (
                   <span className="text-xs text-ink-400">{formatSize(f.filesize)}</span>
