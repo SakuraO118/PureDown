@@ -10,6 +10,10 @@ const require = createRequire(import.meta.url)
 const COOKIES_FILE = process.env.COOKIES_FILE
 const cookieArgs = COOKIES_FILE && existsSync(COOKIES_FILE) ? ['--cookies', COOKIES_FILE] : []
 
+// Proxy — only for sites that need it (YouTube etc.), not global
+const PROXY_URL = process.env.PROXY_URL || ''
+const NEEDS_PROXY = (url: string) => /youtube\.com|youtu\.be/i.test(url)
+
 // Resolve ffmpeg path with fallback chain (fastest & most reliable first):
 // 1. System PATH (`brew install ffmpeg` etc.) — fastest check
 // 2. FFMPEG_PATH env var — explicit override
@@ -37,10 +41,21 @@ function resolveFfmpeg(): string | null {
 
 const ffmpegPath = resolveFfmpeg()
 
-function exec(args: string[]): Promise<{ stdout: string; stderr: string }> {
+function exec(args: string[], url?: string): Promise<{ stdout: string; stderr: string }> {
   return new Promise((resolve, reject) => {
-    const proc = spawn(YT_DLP, [...cookieArgs, ...args], {
+    // Strip global proxy env vars — yt-dlp would inherit them and force proxy for ALL sites
+    const cleanEnv = { ...process.env }
+    delete cleanEnv.HTTP_PROXY
+    delete cleanEnv.HTTPS_PROXY
+    delete cleanEnv.http_proxy
+    delete cleanEnv.https_proxy
+    delete cleanEnv.NO_PROXY
+    delete cleanEnv.no_proxy
+
+    const proxyArgs = (PROXY_URL && url && NEEDS_PROXY(url)) ? ['--proxy', PROXY_URL] : []
+    const proc = spawn(YT_DLP, [...proxyArgs, ...cookieArgs, ...args], {
       stdio: ['ignore', 'pipe', 'pipe'],
+      env: cleanEnv,
     })
     let stdout = ''
     let stderr = ''
@@ -91,7 +106,7 @@ function parseRawFormat(raw: Record<string, unknown>): FormatOption {
 }
 
 export async function parseVideo(url: string): Promise<VideoInfo> {
-  const { stdout } = await exec(['--dump-json', '--no-playlist', url])
+  const { stdout } = await exec(['--dump-json', '--no-playlist', url], url)
   const raw = JSON.parse(stdout)
 
   const formats: FormatOption[] = (raw.formats as Record<string, unknown>[] || [])
@@ -127,7 +142,7 @@ export async function parseVideo(url: string): Promise<VideoInfo> {
 }
 
 export async function parsePlaylist(url: string): Promise<VideoInfo> {
-  const { stdout } = await exec(['--dump-json', '--flat-playlist', url])
+  const { stdout } = await exec(['--dump-json', '--flat-playlist', url], url)
   const lines = stdout.trim().split('\n')
 
   if (lines.length === 0) {
@@ -191,8 +206,21 @@ export function download(
       url,
     ]
 
-    const proc = spawn(YT_DLP, args, {
+    // Strip global proxy env vars
+    const cleanEnv = { ...process.env }
+    delete cleanEnv.HTTP_PROXY
+    delete cleanEnv.HTTPS_PROXY
+    delete cleanEnv.http_proxy
+    delete cleanEnv.https_proxy
+    delete cleanEnv.NO_PROXY
+    delete cleanEnv.no_proxy
+
+    const proxyArgs = (PROXY_URL && NEEDS_PROXY(url)) ? ['--proxy', PROXY_URL] : []
+    const finalArgs = [...proxyArgs, ...args]
+
+    const proc = spawn(YT_DLP, finalArgs, {
       stdio: ['ignore', 'pipe', 'pipe'],
+      env: cleanEnv,
     })
 
     let stderr = ''
@@ -261,8 +289,21 @@ export function downloadStream(
     url,
   ]
 
-  const proc = spawn(YT_DLP, args, {
+  // Strip global proxy env vars
+  const cleanEnv = { ...process.env }
+  delete cleanEnv.HTTP_PROXY
+  delete cleanEnv.HTTPS_PROXY
+  delete cleanEnv.http_proxy
+  delete cleanEnv.https_proxy
+  delete cleanEnv.NO_PROXY
+  delete cleanEnv.no_proxy
+
+  const proxyArgs = (PROXY_URL && NEEDS_PROXY(url)) ? ['--proxy', PROXY_URL] : []
+  const finalArgs = [...proxyArgs, ...args]
+
+  const proc = spawn(YT_DLP, finalArgs, {
     stdio: ['ignore', 'pipe', 'pipe'],  // stdout=video data, stderr=progress
+    env: cleanEnv,
   })
 
   // Build a fallback filename from URL

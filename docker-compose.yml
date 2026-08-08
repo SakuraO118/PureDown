@@ -11,6 +11,8 @@ services:
       # - ./cookies.txt:/data/cookies.txt:ro
     environment:
       - DOWNLOAD_DIR=/data/downloads
+      # ---- 代理（仅 YouTube 走代理，Bilibili 直连） ----
+      # - PROXY_URL=http://host.docker.internal:7890
       # ---- B站 Cookie 文件路径 ----
       # 取消注释下面这行（对应上面的 volume 挂载）:
       # - COOKIES_FILE=/data/cookies.txt

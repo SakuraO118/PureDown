@@ -30,8 +30,8 @@ docker compose version
 ## 第二步：克隆项目
 
 ```bash
-git clone https://github.com/SakuraO118/SakuraDown.git
-cd SakuraDown
+git clone https://github.com/SakuraO118/PureDown.git
+cd PureDown
 ```
 
 ## 第三步：配置
@@ -45,10 +45,10 @@ nano .env
 ```
 
 **代理配置**（国内 VPS 访问 YouTube 需要）：
-- 如果 VPS 上有 clash/v2ray 等代理客户端，取消注释 `HTTP_PROXY` 和 `HTTPS_PROXY`
-- 代理地址示例：本机 clash 用 `http://host.docker.internal:7890`，同机 clash 用 `http://172.17.0.1:7890`
+- 设置 `PROXY_URL`，仅 YouTube 走代理，Bilibili 等国内站点直连
+- 代理地址示例：`PROXY_URL=http://host.docker.internal:7890`
 
-**如果暂时没有代理**，可以先用 Bilibili 测试，不需要配置代理。
+**如果暂时没有代理**，可以先用 Bilibili 测试，`PROXY_URL` 留空即可。
 
 ## 第四步：构建并启动
 
@@ -71,10 +71,10 @@ docker compose logs -f
 ### 更新代码
 
 ```bash
-cd ~/SakuraDown
+cd ~/PureDown
 git pull
 docker compose build
-docker compose up -d
+docker compose up -d --remove-orphans
 ```
 
 ### 查看日志
@@ -101,7 +101,7 @@ docker compose down
 下载的文件在容器内的 `/data/downloads`，通过 volume 映射到宿主机的 `./downloads` 目录：
 
 ```bash
-ls -la ~/SakuraDown/downloads/
+ls -la ~/PureDown/downloads/
 ```
 
 ## 防火墙设置
@@ -131,20 +131,26 @@ docker compose up -d
 ```
 
 ### 端口被占用
+
+旧容器（如重命名目录前启动的）可能还在占用端口：
+
 ```bash
-# 查看 3001 端口是谁在用
-sudo lsof -i :3001
-# 换成其他端口：修改 docker-compose.yml 中 ports 行的左边部分
-# "3002:3001" 表示用 3002 端口访问
+# 查看旧容器
+docker ps -a | grep sakuradown
+
+# 停掉旧容器和网络
+docker stop sakuradown-sakuradown-1
+docker rm sakuradown-sakuradown-1
+docker network rm sakuradown_default
 ```
 
 ### 磁盘空间不足
 下载文件占用空间，定期清理：
 ```bash
 # 查看下载目录大小
-du -sh ~/SakuraDown/downloads/
+du -sh ~/PureDown/downloads/
 # 删除旧文件
-rm -rf ~/SakuraDown/downloads/*
+rm -rf ~/PureDown/downloads/*
 ```
 
 ## 下一步（TODO）
