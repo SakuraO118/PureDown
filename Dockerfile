@@ -6,9 +6,9 @@ RUN apk add --no-cache ffmpeg python3 py3-pip && \
 
 WORKDIR /app
 
-# Enable pnpm (use npmmirror for China network)
+# Enable pnpm (use npmmirror for China network; corepack ignores npm registry config, so install pnpm via npm)
 RUN npm config set registry https://registry.npmmirror.com && \
-    corepack enable && corepack prepare pnpm@latest --activate
+    npm install -g pnpm@latest
 
 # Copy workspace config and lockfile
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
