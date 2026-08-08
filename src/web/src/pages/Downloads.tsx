@@ -1,9 +1,12 @@
 import { useDownloads } from '@/hooks/useDownloads'
 import { useDownload } from '@/hooks/useDownload'
-import { DownloadCloud, FolderOpen, Film, Loader2, Check, AlertCircle, Clock } from 'lucide-react'
+import { DownloadCloud, FolderOpen, Film, Loader2, Check, AlertCircle, Clock, Download } from 'lucide-react'
 import { EmptyState } from '@/components/EmptyState'
 import { ProgressBar } from '@/components/ProgressBar'
+import { api } from '@/lib/api'
 import type { DownloadTask } from '@sakuradown/shared'
+
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
 
 const statusConfig = {
   downloading: { icon: Loader2, label: '下载中', iconClass: 'animate-spin text-caramel-500' },
@@ -113,13 +116,29 @@ export default function Downloads() {
 
                         {/* Actions */}
                         {task.status === 'completed' && task.outputPath && (
-                          <button
-                            onClick={() => window.open(`file://${task.outputPath}`, '_blank')}
-                            className="shrink-0 p-1.5 text-warm-400 hover:text-warm-600 transition-colors rounded hover:bg-warm-100"
-                            title="打开文件夹"
-                          >
-                            <FolderOpen size={15} />
-                          </button>
+                          <div className="flex items-center gap-0.5 shrink-0">
+                            {/* Download button (always available) */}
+                            {task.filename && (
+                              <a
+                                href={api.getDownloadUrl(task.filename)}
+                                download
+                                className="shrink-0 p-1.5 text-caramel-500 hover:text-caramel-600 transition-colors rounded hover:bg-warm-100"
+                                title="下载文件"
+                              >
+                                <Download size={15} />
+                              </a>
+                            )}
+                            {/* Open folder (localhost only) */}
+                            {isLocalhost && (
+                              <button
+                                onClick={() => window.open(`file://${task.outputPath}`, '_blank')}
+                                className="shrink-0 p-1.5 text-warm-400 hover:text-warm-600 transition-colors rounded hover:bg-warm-100"
+                                title="打开文件夹"
+                              >
+                                <FolderOpen size={15} />
+                              </button>
+                            )}
+                          </div>
                         )}
                       </div>
 

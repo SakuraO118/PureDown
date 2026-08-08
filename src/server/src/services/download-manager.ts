@@ -74,6 +74,7 @@ class DownloadManager {
       const result = await download(task.url, task.formatId, this.outputDir, onProgress)
       task.status = 'completed'
       task.progress = { ...task.progress!, percent: 100, status: 'completed' }
+      task.filename = result.filename
       this.updateTask(task)
       this.onComplete?.(taskId, result.filePath, result.filename)
     } catch (err) {

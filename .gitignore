@@ -3,7 +3,7 @@ dist/
 *.tsbuildinfo
 specs/
 .DS_Store
-
 # 本地 Claude Code 配置
 .claude/
 CLAUDE.md 
+.env

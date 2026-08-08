@@ -31,6 +31,9 @@ export const api = {
   getTask: (id: string) => get<DownloadTask>(`/download/${id}`),
   getDownloads: () => get<DownloadTask[]>('/downloads'),
   getFiles: () => get<{ name: string; path: string; size: number }[]>('/files'),
+  getDownloadUrl: (filename: string) => `/api/files/${encodeURIComponent(filename)}/download`,
+  getStreamUrl: (url: string, formatId: string) =>
+    `/api/download/stream?url=${encodeURIComponent(url)}&formatId=${encodeURIComponent(formatId)}`,
   getSettings: () => get<{ downloadDir: string }>('/settings'),
   updateSettings: (downloadDir: string) =>
     post<{ downloadDir: string }>('/settings', { downloadDir }),
