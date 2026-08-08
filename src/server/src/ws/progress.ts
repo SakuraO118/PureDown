@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify'
-import type { WsMessage } from '@sakuradown/shared'
+import type { WsMessage } from '@puredown/shared'
 import { downloadManager } from '../services/download-manager.js'
 
 export function setupWebSocket(app: FastifyInstance) {

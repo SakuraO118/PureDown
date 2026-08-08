@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify'
-import type { DownloadRequest, DownloadResponse } from '@sakuradown/shared'
+import type { DownloadRequest, DownloadResponse } from '@puredown/shared'
 import { downloadManager } from '../services/download-manager.js'
 import { parseVideo, downloadStream } from '../services/ytdlp.js'
 

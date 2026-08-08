@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import type { DownloadProgress } from '@sakuradown/shared'
+import type { DownloadProgress } from '@puredown/shared'
 import { api } from '@/lib/api'
 import { connectProgress } from '@/lib/ws'
 

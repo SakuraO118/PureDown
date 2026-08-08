@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Clock, User, Download, Loader2, ArrowLeft, Check } from 'lucide-react'
-import type { VideoInfo as VideoInfoType } from '@sakuradown/shared'
+import type { VideoInfo as VideoInfoType } from '@puredown/shared'
 import { FormatSelector } from '@/components/FormatSelector'
 import { EmptyState } from '@/components/EmptyState'
-import { api } from '@/lib/api'
+import { useDownload } from '@/hooks/useDownload'
 import { toast } from 'sonner'
 
 export default function VideoInfo() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { startDownload } = useDownload()
   const [selectedFormat, setSelectedFormat] = useState<string | null>(null)
   const [downloading, setDownloading] = useState(false)
   const [done, setDone] = useState(false)
@@ -55,19 +56,11 @@ export default function VideoInfo() {
         ? `${selectedFormat}+bestaudio[ext=m4a]/bestaudio`
         : selectedFormat
 
-      // Direct streaming download: yt-dlp stdout → browser (no server storage)
-      const streamUrl = api.getStreamUrl(video.webpageUrl, downloadFormatId)
-
-      // Trigger browser download via hidden anchor
-      const a = document.createElement('a')
-      a.href = streamUrl
-      a.download = ''
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
+      // Server-side download: yt-dlp saves to server temp dir, progress shown on /downloads
+      await startDownload(video.webpageUrl, downloadFormatId)
 
       setDone(true)
-      toast.success('下载已开始，请查看浏览器下载列表')
+      toast.success('下载已开始，可前往下载管理查看进度')
     } catch (err) {
       toast.error((err as Error).message || '下载失败')
     } finally {
@@ -171,7 +164,7 @@ export default function VideoInfo() {
             ) : done ? (
               <>
                 <Check size={16} />
-                已添加到队列
+                已添加到下载列表
               </>
             ) : (
               <>

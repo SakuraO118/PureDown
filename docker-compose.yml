@@ -1,5 +1,5 @@
 services:
-  sakuradown:
+  puredown:
     build: .
     ports:
       - "3001:3001"

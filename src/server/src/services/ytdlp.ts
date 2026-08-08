@@ -1,6 +1,6 @@
 import { spawn, execSync } from 'child_process'
 import { createRequire } from 'node:module'
-import type { VideoInfo, FormatOption, PlaylistEntry } from '@sakuradown/shared'
+import type { VideoInfo, FormatOption, PlaylistEntry } from '@puredown/shared'
 import { existsSync, accessSync, constants } from 'fs'
 
 const YT_DLP = 'yt-dlp'

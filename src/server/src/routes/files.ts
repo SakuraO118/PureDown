@@ -31,22 +31,6 @@ export async function filesRoutes(app: FastifyInstance) {
     }
   })
 
-  app.get('/api/settings', async (_req, reply) => {
-    return reply.send({
-      downloadDir: downloadManager.getOutputDir(),
-    })
-  })
-
-  app.post('/api/settings', async (req, reply) => {
-    const { downloadDir } = req.body as { downloadDir?: string }
-    if (downloadDir) {
-      downloadManager.setOutputDir(downloadDir)
-    }
-    return reply.send({
-      downloadDir: downloadManager.getOutputDir(),
-    })
-  })
-
   // File download endpoint for remote deployment
   app.get('/api/files/:name/download', async (req, reply) => {
     const { name } = req.params as { name: string }

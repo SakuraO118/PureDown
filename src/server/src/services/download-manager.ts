@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid'
-import type { DownloadTask, DownloadProgress } from '@sakuradown/shared'
+import type { DownloadTask, DownloadProgress } from '@puredown/shared'
 import { download, type ProgressCallback } from './ytdlp.js'
 
 const MAX_CONCURRENT = 2
@@ -8,16 +8,12 @@ class DownloadManager {
   private tasks = new Map<string, DownloadTask>()
   private queue: string[] = []
   private active = 0
-  private outputDir = process.env.DOWNLOAD_DIR || `${process.env.HOME || '/tmp'}/Downloads/SakuraDown`
+  private outputDir = process.env.DOWNLOAD_DIR || `${process.env.HOME || '/tmp'}/Downloads/PureDown`
 
   // Called when progress updates; set by the WebSocket handler
   onProgress?: (taskId: string, progress: DownloadProgress) => void
   onComplete?: (taskId: string, filePath: string, filename: string) => void
   onError?: (taskId: string, error: string) => void
-
-  setOutputDir(dir: string) {
-    this.outputDir = dir
-  }
 
   getOutputDir(): string {
     return this.outputDir

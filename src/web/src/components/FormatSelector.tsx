@@ -1,4 +1,4 @@
-import type { FormatOption } from '@sakuradown/shared'
+import type { FormatOption } from '@puredown/shared'
 import { cn } from '@/lib/utils'
 import { Film, Music, Video } from 'lucide-react'
 

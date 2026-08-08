@@ -4,7 +4,7 @@ import { DownloadCloud, FolderOpen, Film, Loader2, Check, AlertCircle, Clock, Do
 import { EmptyState } from '@/components/EmptyState'
 import { ProgressBar } from '@/components/ProgressBar'
 import { api } from '@/lib/api'
-import type { DownloadTask } from '@sakuradown/shared'
+import type { DownloadTask } from '@puredown/shared'
 
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
 

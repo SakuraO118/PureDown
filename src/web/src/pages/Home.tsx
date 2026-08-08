@@ -41,7 +41,7 @@ export default function Home() {
       {/* Hero */}
       <div className="text-center mb-10">
         <h1 className="font-display text-5xl font-light text-warm-800 tracking-wide mb-3">
-          SakuraDown
+          PureDown
         </h1>
         <p className="text-warm-500 text-sm">
           粘贴视频链接，选择格式，开始下载

@@ -1,4 +1,4 @@
-import type { WsMessage } from '@sakuradown/shared'
+import type { WsMessage } from '@puredown/shared'
 
 export function connectProgress(
   taskId: string,

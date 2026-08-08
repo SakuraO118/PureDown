@@ -15,7 +15,7 @@ export function Sidebar() {
       <div className="h-14 flex items-center gap-2.5 px-4 border-b border-warm-200">
         <span className="text-lg leading-none shrink-0">🌸</span>
         <span className="hidden lg:inline text-base font-display font-medium text-warm-800 tracking-wide">
-          SakuraDown
+          PureDown
         </span>
       </div>
 

@@ -1,4 +1,4 @@
-import type { ParseResponse, DownloadResponse, DownloadTask } from '@sakuradown/shared'
+import type { ParseResponse, DownloadResponse, DownloadTask } from '@puredown/shared'
 
 const BASE = '/api'
 
@@ -34,7 +34,4 @@ export const api = {
   getDownloadUrl: (filename: string) => `/api/files/${encodeURIComponent(filename)}/download`,
   getStreamUrl: (url: string, formatId: string) =>
     `/api/download/stream?url=${encodeURIComponent(url)}&formatId=${encodeURIComponent(formatId)}`,
-  getSettings: () => get<{ downloadDir: string }>('/settings'),
-  updateSettings: (downloadDir: string) =>
-    post<{ downloadDir: string }>('/settings', { downloadDir }),
 }

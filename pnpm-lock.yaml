@@ -19,7 +19,7 @@ importers:
       '@fastify/websocket':
         specifier: ^11.0.2
         version: 11.3.0
-      '@sakuradown/shared':
+      '@puredown/shared':
         specifier: workspace:*
         version: link:../shared
       fastify:
@@ -54,6 +54,9 @@ importers:
 
   src/web:
     dependencies:
+      '@puredown/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@radix-ui/react-dialog':
         specifier: ^1.1.7
         version: 1.1.23(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -75,9 +78,6 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.2.3
         version: 1.2.16(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@sakuradown/shared':
-        specifier: workspace:*
-        version: link:../shared
       '@tanstack/react-query':
         specifier: ^5.67.2
         version: 5.101.4(react@19.2.8)

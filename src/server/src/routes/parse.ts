@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify'
-import type { ParseRequest, ParseResponse } from '@sakuradown/shared'
+import type { ParseRequest, ParseResponse } from '@puredown/shared'
 import { parseVideo, parsePlaylist } from '../services/ytdlp.js'
 
 export async function parseRoutes(app: FastifyInstance) {

@@ -1,4 +1,4 @@
-# SakuraDown 部署操作指南
+# PureDown 部署操作指南
 
 ## 前提条件
 
