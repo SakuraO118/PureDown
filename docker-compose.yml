@@ -5,15 +5,11 @@ services:
       - "3001:3001"
     volumes:
       - ./downloads:/data/downloads
-      # ---- B站 Cookie（国内 VPS 412 防盗链需要） ----
-      # 1. 从浏览器导出 cookies.txt 放到项目目录
-      # 2. 取消注释下面这行:
-      # - ./cookies.txt:/data/cookies.txt:ro
+      # B站 Cookie（扫码登录自动保存，也可手动替换）
+      - ./cookies.txt:/data/cookies.txt
     environment:
       - DOWNLOAD_DIR=/data/downloads
+      - COOKIES_FILE=/data/cookies.txt
       # ---- 代理（仅 YouTube 走代理，Bilibili 直连） ----
       # - PROXY_URL=http://host.docker.internal:7890
-      # ---- B站 Cookie 文件路径 ----
-      # 取消注释下面这行（对应上面的 volume 挂载）:
-      # - COOKIES_FILE=/data/cookies.txt
     restart: unless-stopped

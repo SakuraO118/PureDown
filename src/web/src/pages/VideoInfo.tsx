@@ -5,6 +5,7 @@ import type { VideoInfo as VideoInfoType } from '@puredown/shared'
 import { FormatSelector } from '@/components/FormatSelector'
 import { EmptyState } from '@/components/EmptyState'
 import { useDownload } from '@/hooks/useDownload'
+import { api } from '@/lib/api'
 import { toast } from 'sonner'
 
 export default function VideoInfo() {
@@ -14,6 +15,7 @@ export default function VideoInfo() {
   const [selectedFormat, setSelectedFormat] = useState<string | null>(null)
   const [downloading, setDownloading] = useState(false)
   const [done, setDone] = useState(false)
+  const [imgError, setImgError] = useState(false)
 
   // Load video info from sessionStorage
   const raw = sessionStorage.getItem(`video-${id}`)
@@ -80,15 +82,16 @@ export default function VideoInfo() {
 
       <div className="flex flex-col sm:flex-row gap-6">
         {/* Thumbnail */}
-        {video.thumbnail ? (
+        {video.thumbnail && !imgError ? (
           <img
-            src={video.thumbnail}
+            src={api.proxyImage(video.thumbnail)}
             alt={video.title}
-            className="w-full sm:w-72 rounded-2xl shadow-card object-cover shrink-0"
+            onError={() => setImgError(true)}
+            className="w-full sm:w-72 rounded-2xl shadow-card object-cover shrink-0 bg-white/20"
           />
         ) : (
           <div className="w-full sm:w-72 h-44 rounded-2xl bg-white/30 flex items-center justify-center shrink-0">
-            <span className="text-ink-400 text-sm">无封面</span>
+            <span className="text-ink-400 text-sm">{video.thumbnail ? '封面加载失败' : '无封面'}</span>
           </div>
         )}
 

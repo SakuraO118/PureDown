@@ -34,4 +34,5 @@ export const api = {
   getDownloadUrl: (filename: string) => `/api/files/${encodeURIComponent(filename)}/download`,
   getStreamUrl: (url: string, formatId: string) =>
     `/api/download/stream?url=${encodeURIComponent(url)}&formatId=${encodeURIComponent(formatId)}`,
+  proxyImage: (url: string) => `/api/proxy-image?url=${encodeURIComponent(url)}`,
 }

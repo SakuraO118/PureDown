@@ -100,6 +100,7 @@ function parseRawFormat(raw: Record<string, unknown>): FormatOption {
     filesize: (raw.filesize as number) || (raw.filesize_approx as number) || 0,
     vcodec,
     acodec,
+    asr: (raw.asr as number) || 0,
     note,
     type,
   }

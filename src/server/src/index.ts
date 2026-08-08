@@ -4,6 +4,7 @@ import websocket from '@fastify/websocket'
 import { parseRoutes } from './routes/parse.js'
 import { downloadRoutes } from './routes/download.js'
 import { filesRoutes } from './routes/files.js'
+import { bilibiliAuthRoutes } from './routes/bilibili-auth.js'
 import { staticRoutes } from './routes/static.js'
 import { setupWebSocket } from './ws/progress.js'
 
@@ -19,6 +20,7 @@ async function main() {
   await app.register(parseRoutes)
   await app.register(downloadRoutes)
   await app.register(filesRoutes)
+  await app.register(bilibiliAuthRoutes)
 
   setupWebSocket(app)
 

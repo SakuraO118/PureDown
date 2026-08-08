@@ -5,6 +5,29 @@ import { join } from 'path'
 import { downloadManager } from '../services/download-manager.js'
 
 export async function filesRoutes(app: FastifyInstance) {
+  // Proxy external images (bypass referrer/防盗链 check)
+  app.get('/api/proxy-image', async (req, reply) => {
+    const { url } = req.query as { url?: string }
+    if (!url) return reply.status(400).send({ error: 'url required' })
+
+    try {
+      const parsed = new URL(url)
+      const client = parsed.protocol === 'https:' ? require('https') : require('http')
+      const data = await new Promise<Buffer>((resolve, reject) => {
+        client.get(url, { headers: { Referer: parsed.origin, 'User-Agent': 'PureDown/1.0' } }, (res: any) => {
+          if (res.statusCode && res.statusCode >= 400) return reject(new Error(`HTTP ${res.statusCode}`))
+          const chunks: Buffer[] = []
+          res.on('data', (c: Buffer) => chunks.push(c))
+          res.on('end', () => resolve(Buffer.concat(chunks)))
+        }).on('error', reject)
+      })
+      reply.header('Content-Type', 'image/jpeg')
+      reply.header('Cache-Control', 'public, max-age=86400')
+      return reply.send(data)
+    } catch {
+      return reply.status(404).send({ error: 'Image not found' })
+    }
+  })
   app.get('/api/files', async (_req, reply) => {
     const dir = downloadManager.getOutputDir()
     try {

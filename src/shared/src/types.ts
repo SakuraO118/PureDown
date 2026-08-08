@@ -8,6 +8,7 @@ export interface FormatOption {
   filesize: number     // bytes, 0 if unknown
   vcodec: string       // e.g. "avc1.640028"
   acodec: string       // e.g. "mp4a.40.2"
+  asr: number          // audio sample rate in Hz, e.g. 44100; 0 if unknown
   note: string         // e.g. "1080p" or "audio only"
   type: 'video+audio' | 'video-only' | 'audio-only'
 }
