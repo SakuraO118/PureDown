@@ -22,6 +22,7 @@ export default function VideoInfo() {
   if (!raw) {
     return (
       <div className="max-w-5xl mx-auto p-6">
+      <div className="max-w-5xl mx-auto p-6">
         <EmptyState
           icon={ArrowLeft}
           title="视频信息已过期"
@@ -87,10 +88,11 @@ export default function VideoInfo() {
             src={api.proxyImage(video.thumbnail)}
             alt={video.title}
             onError={() => setImgError(true)}
-            className="w-full sm:w-80 rounded-2xl shadow-card object-contain shrink-0 bg-white/20"
+            className="w-full sm:w-96 rounded-2xl shadow-card object-contain shrink-0 sm:self-start bg-white/20"
           />
         ) : (
           <div className="w-full sm:w-80 h-48 rounded-2xl bg-white/30 flex items-center justify-center shrink-0">
+          <div className="w-full sm:w-96 h-56 rounded-2xl bg-white/30 flex items-center justify-center shrink-0 sm:self-start">
             <span className="text-ink-400 text-sm">{video.thumbnail ? '封面加载失败' : '无封面'}</span>
           </div>
         )}
