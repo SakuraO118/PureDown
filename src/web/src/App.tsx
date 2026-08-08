@@ -8,7 +8,7 @@ import Settings from '@/pages/Settings'
 
 export default function App() {
   return (
-    <div className="h-screen flex overflow-hidden bg-warm-50">
+    <div className="h-screen flex overflow-hidden">
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         <ErrorBoundary>
@@ -20,6 +20,10 @@ export default function App() {
           </Routes>
         </ErrorBoundary>
       </main>
+      {/* Version — fixed bottom-right */}
+      <p className="fixed bottom-3 right-4 text-[11px] text-ink-400/60 select-none pointer-events-none z-50">
+        v0.1.0
+      </p>
     </div>
   )
 }

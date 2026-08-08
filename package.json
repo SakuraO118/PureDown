@@ -7,5 +7,8 @@
     "dev:web": "pnpm --filter @puredown/web dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
   }
 }

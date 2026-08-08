@@ -40,10 +40,10 @@ export default function Home() {
     <div className="max-w-xl mx-auto pt-24 pb-16 px-4">
       {/* Hero */}
       <div className="text-center mb-10">
-        <h1 className="font-display text-5xl font-light text-warm-800 tracking-wide mb-3">
+        <h1 className="font-display text-5xl font-light text-ink-900 tracking-wide mb-3">
           PureDown
         </h1>
-        <p className="text-warm-500 text-sm">
+        <p className="text-ink-500 text-sm">
           粘贴视频链接，选择格式，开始下载
         </p>
       </div>
@@ -59,18 +59,18 @@ export default function Home() {
             disabled={parse.isPending}
             placeholder="粘贴 Bilibili / YouTube 视频链接…"
             className={cn(
-              'w-full h-12 px-4 pr-10 bg-white border rounded-md text-sm transition-colors',
-              'placeholder:text-warm-400',
-              'focus:outline-none focus:border-caramel-400 focus:ring-1 focus:ring-caramel-400/20',
+              'w-full h-12 px-4 pr-10 bg-white/75 backdrop-blur-md border rounded-xl text-sm transition-all duration-200',
+              'placeholder:text-ink-400',
+              'focus:outline-none focus:border-ocean-400 focus:ring-2 focus:ring-ocean-400/20 focus:bg-white/90',
               parse.isError
                 ? 'border-red-300'
-                : 'border-warm-300'
+                : 'border-white/30'
             )}
           />
           <button
             onClick={handlePaste}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-warm-400
-                       hover:text-warm-600 transition-colors"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-ink-400
+                       hover:text-ink-600 transition-colors"
             title="粘贴 (Ctrl+V)"
           >
             <ClipboardPaste size={18} />
@@ -80,8 +80,8 @@ export default function Home() {
           onClick={handleParse}
           disabled={parse.isPending || !url.trim()}
           className={cn(
-            'h-12 px-6 rounded-md font-medium text-sm flex items-center gap-2 transition-colors shrink-0',
-            'bg-caramel-400 hover:bg-caramel-500 text-white',
+            'h-12 px-6 rounded-xl font-medium text-sm flex items-center gap-2 transition-all duration-200 shrink-0',
+            'bg-ocean-400 hover:bg-ocean-500 text-white shadow-md shadow-ocean-400/20',
             'disabled:opacity-50 disabled:cursor-not-allowed'
           )}
         >
@@ -107,7 +107,7 @@ export default function Home() {
       )}
 
       {/* Supported sites hint */}
-      <p className="text-xs text-warm-400 text-center mt-6">
+      <p className="text-xs text-ink-400 text-center mt-6">
         支持 Bilibili · YouTube · 以及 yt-dlp 兼容的所有站点
       </p>
     </div>

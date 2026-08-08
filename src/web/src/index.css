@@ -1,26 +1,30 @@
 @import "tailwindcss";
 
 @theme {
-  /* Warm white palette */
-  --color-warm-50: #faf8f5;
-  --color-warm-100: #f5f3f0;
-  --color-warm-200: #f0ece6;
-  --color-warm-300: #e8e3dc;
-  --color-warm-400: #b8b0a8;
-  --color-warm-500: #8c8278;
-  --color-warm-600: #5c5450;
-  --color-warm-700: #3c3430;
-  --color-warm-800: #2a2320;
-  --color-warm-900: #1a1512;
+  /* Ocean blue — primary accent */
+  --color-ocean-50: #eff7fb;
+  --color-ocean-100: #dceef6;
+  --color-ocean-200: #b3ddf0;
+  --color-ocean-300: #80c9e4;
+  --color-ocean-400: #4db3d9;
+  --color-ocean-500: #2d9ac4;
+  --color-ocean-600: #1c7da3;
 
-  /* Caramel accent */
-  --color-caramel-50: #faf5f0;
-  --color-caramel-100: #f5ede3;
-  --color-caramel-200: #e8d5c0;
-  --color-caramel-300: #d4b896;
-  --color-caramel-400: #c4946c;
-  --color-caramel-500: #b08058;
-  --color-caramel-600: #966c44;
+  /* Sand — warm secondary accent */
+  --color-sand-50: #faf7f3;
+  --color-sand-100: #f5efe8;
+  --color-sand-200: #ebe0d4;
+  --color-sand-300: #d4c4a8;
+  --color-sand-400: #b8946c;
+  --color-sand-500: #9a7854;
+
+  /* Ink — text hierarchy (dark blue-gray, readable on glass) */
+  --color-ink-400: #94a3b8;
+  --color-ink-500: #64748b;
+  --color-ink-600: #475569;
+  --color-ink-700: #334155;
+  --color-ink-800: #1e293b;
+  --color-ink-900: #0f172a;
 
   /* Font families */
   --font-display: "Songti SC", "Noto Serif CJK SC", serif;
@@ -28,13 +32,20 @@
   --font-mono: "SF Mono", "Cascadia Code", "JetBrains Mono", monospace;
 
   /* Shadows */
-  --shadow-card: 0 1px 3px rgba(60, 52, 48, 0.04);
-  --shadow-elevated: 0 2px 8px rgba(60, 52, 48, 0.06);
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
+/* =============================================
+   Global background — fullscreen image + blur
+   ============================================= */
 html {
-  background-color: var(--color-warm-50);
-  color: var(--color-warm-700);
+  background-color: #dceef6; /* ocean-100 fallback */
+  background-image: url('/bg.webp');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: var(--color-ink-700);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -42,21 +53,33 @@ html {
 
 body {
   margin: 0;
+  background: transparent;
+}
+
+/* Global frosted glass overlay — slightly blurs the background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: -1;
 }
 
 /* Selection */
 ::selection {
-  background-color: var(--color-caramel-100);
-  color: var(--color-warm-700);
+  background-color: rgba(77, 179, 217, 0.2); /* ocean-400 at 20% */
+  color: var(--color-ink-800);
 }
 
 /* Focus ring */
 :focus-visible {
-  outline: 2px solid var(--color-caramel-400);
-  outline-offset: 1px;
+  outline: 2px solid var(--color-ocean-400);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
-/* Custom scrollbar — light */
+/* Custom scrollbar — light on glass */
 ::-webkit-scrollbar {
   width: 5px;
 }
@@ -64,9 +87,9 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-warm-300);
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-warm-400);
+  background: rgba(255, 255, 255, 0.5);
 }

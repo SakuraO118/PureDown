@@ -2,13 +2,13 @@ import { cn } from '@/lib/utils'
 
 function SkeletonBlock({ className }: { className?: string }) {
   return (
-    <div className={cn('animate-pulse bg-warm-200 rounded-sm', className)} />
+    <div className={cn('animate-pulse bg-white/40 rounded-lg', className)} />
   )
 }
 
 export function SkeletonCard() {
   return (
-    <div className="bg-white rounded-md border border-warm-200 p-4 space-y-3">
+    <div className="bg-white/75 backdrop-blur-lg rounded-2xl border border-white/25 p-4 space-y-3">
       <SkeletonBlock className="h-4 w-3/4" />
       <SkeletonBlock className="h-3 w-1/2" />
       <SkeletonBlock className="h-2 w-full" />
@@ -19,7 +19,7 @@ export function SkeletonCard() {
 export function SkeletonVideoInfo() {
   return (
     <div className="flex gap-6">
-      <SkeletonBlock className="w-72 h-44 shrink-0 rounded-md" />
+      <SkeletonBlock className="w-72 h-44 shrink-0 rounded-2xl" />
       <div className="flex-1 space-y-3">
         <SkeletonBlock className="h-6 w-3/4" />
         <div className="flex gap-4">

@@ -27,7 +27,7 @@ export default function VideoInfo() {
           action={
             <button
               onClick={() => navigate('/')}
-              className="px-4 py-2 text-sm rounded-md bg-caramel-400 hover:bg-caramel-500 text-white transition-colors"
+              className="px-4 py-2 text-sm rounded-xl bg-ocean-400 hover:bg-ocean-500 text-white transition-colors shadow-md shadow-ocean-400/20"
             >
               返回首页
             </button>
@@ -73,7 +73,7 @@ export default function VideoInfo() {
       {/* Breadcrumb */}
       <button
         onClick={() => navigate('/')}
-        className="inline-flex items-center gap-1 text-sm text-warm-500 hover:text-warm-700 transition-colors mb-6"
+        className="inline-flex items-center gap-1 text-sm text-ink-500 hover:text-ink-700 transition-colors mb-6"
       >
         <ArrowLeft size={14} /> 返回
       </button>
@@ -84,22 +84,22 @@ export default function VideoInfo() {
           <img
             src={video.thumbnail}
             alt={video.title}
-            className="w-full sm:w-72 rounded-md shadow-card object-cover shrink-0"
+            className="w-full sm:w-72 rounded-2xl shadow-card object-cover shrink-0"
           />
         ) : (
-          <div className="w-full sm:w-72 h-44 rounded-md bg-warm-100 flex items-center justify-center shrink-0">
-            <span className="text-warm-400 text-sm">无封面</span>
+          <div className="w-full sm:w-72 h-44 rounded-2xl bg-white/30 flex items-center justify-center shrink-0">
+            <span className="text-ink-400 text-sm">无封面</span>
           </div>
         )}
 
         <div className="flex-1 min-w-0">
           {/* Title */}
-          <h1 className="font-display text-xl font-medium text-warm-800 leading-snug mb-3">
+          <h1 className="font-display text-xl font-medium text-ink-800 leading-snug mb-3">
             {video.title}
           </h1>
 
           {/* Meta */}
-          <div className="flex items-center gap-4 text-sm text-warm-500 mb-5">
+          <div className="flex items-center gap-4 text-sm text-ink-500 mb-5">
             <span className="flex items-center gap-1.5">
               <User size={14} strokeWidth={1.5} />
               {video.uploader || '未知 UP 主'}
@@ -115,21 +115,21 @@ export default function VideoInfo() {
           {/* Playlist summary */}
           {video.isPlaylist && video.entries.length > 0 && (
             <details className="mb-5">
-              <summary className="text-sm text-warm-500 cursor-pointer hover:text-warm-600 transition-colors select-none">
+              <summary className="text-sm text-ink-500 cursor-pointer hover:text-ink-600 transition-colors select-none">
                 合集 · {video.entries.length} 个视频
                 {video.playlistTitle && ` — ${video.playlistTitle}`}
               </summary>
-              <div className="mt-2 max-h-40 overflow-y-auto space-y-0.5 pl-1 border-l-2 border-warm-200">
+              <div className="mt-2 max-h-40 overflow-y-auto space-y-0.5 pl-1 border-l-2 border-white/25">
                 {video.entries.map((entry) => (
                   <div
                     key={entry.id}
-                    className="flex items-center gap-2 text-sm text-warm-500 py-0.5 pl-2"
+                    className="flex items-center gap-2 text-sm text-ink-500 py-0.5 pl-2"
                   >
-                    <span className="text-warm-400 w-6 text-right shrink-0 text-xs font-mono">
+                    <span className="text-ink-400 w-6 text-right shrink-0 text-xs font-mono">
                       {entry.index}.
                     </span>
                     <span className="truncate flex-1">{entry.title}</span>
-                    <span className="text-warm-400 shrink-0 text-xs font-mono">
+                    <span className="text-ink-400 shrink-0 text-xs font-mono">
                       {formatDuration(entry.duration)}
                     </span>
                   </div>
@@ -140,7 +140,7 @@ export default function VideoInfo() {
 
           {/* Format selector */}
           <div className="mb-5">
-            <p className="text-xs font-medium text-warm-500 mb-2 uppercase tracking-wide">选择格式</p>
+            <p className="text-xs font-medium text-ink-500 mb-2 uppercase tracking-wide">选择格式</p>
             <FormatSelector
               formats={video.formats}
               selected={selectedFormat}
@@ -152,9 +152,9 @@ export default function VideoInfo() {
           <button
             onClick={handleDownload}
             disabled={!selectedFormat || downloading}
-            className="w-full h-11 rounded-md bg-caramel-400 hover:bg-caramel-500 text-white
-                       font-medium text-sm flex items-center justify-center gap-2 transition-colors
-                       disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-11 rounded-xl bg-ocean-400 hover:bg-ocean-500 text-white
+                       font-medium text-sm flex items-center justify-center gap-2 transition-all duration-200
+                       disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-ocean-400/20"
           >
             {downloading ? (
               <>

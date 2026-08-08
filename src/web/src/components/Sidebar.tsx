@@ -10,42 +10,28 @@ const navItems = [
 
 export function Sidebar() {
   return (
-    <aside className="w-16 lg:w-56 border-r border-warm-300 bg-warm-100 flex flex-col shrink-0">
-      {/* Logo */}
-      <div className="h-14 flex items-center gap-2.5 px-4 border-b border-warm-200">
-        <span className="text-lg leading-none shrink-0">🌸</span>
-        <span className="hidden lg:inline text-base font-display font-medium text-warm-800 tracking-wide">
-          PureDown
-        </span>
-      </div>
-
+    <aside className="group w-16 hover:w-56 border-r border-white/5 bg-white/10 backdrop-blur-xl flex flex-col shrink-0 transition-all duration-300 ease-out">
       {/* Navigation */}
-      <nav className="flex-1 p-2 space-y-0.5">
+      <nav className="flex-1 p-2 pt-3 space-y-0.5">
         {navItems.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
             to={to}
             className={({ isActive }) =>
               cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors',
+                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap overflow-hidden',
                 isActive
-                  ? 'bg-caramel-100 text-caramel-500 border-l-[3px] border-l-caramel-400 pl-[9px]'
-                  : 'text-warm-500 hover:bg-warm-200 hover:text-warm-700 border-l-[3px] border-l-transparent pl-[9px]'
+                  ? 'bg-ocean-50/80 text-ocean-500'
+                  : 'text-ink-500 hover:bg-white/50 hover:text-ink-700'
               )
             }
           >
-            <Icon size={18} strokeWidth={1.75} />
-            <span className="hidden lg:inline">{label}</span>
+            <Icon size={18} strokeWidth={1.75} className="shrink-0" />
+            <span className="hidden group-hover:inline">{label}</span>
           </NavLink>
         ))}
       </nav>
 
-      {/* Version */}
-      <div className="px-4 py-3 border-t border-warm-200">
-        <p className="hidden lg:block text-[11px] text-warm-400 select-none">
-          v0.1.0
-        </p>
-      </div>
     </aside>
   )
 }
