@@ -1,19 +1,16 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Clock, User, Download, Loader2, ArrowLeft, Check } from 'lucide-react'
+import { Clock, User, Download, ArrowLeft, Check } from 'lucide-react'
 import type { VideoInfo as VideoInfoType } from '@puredown/shared'
 import { FormatSelector } from '@/components/FormatSelector'
 import { EmptyState } from '@/components/EmptyState'
-import { useDownload } from '@/hooks/useDownload'
 import { api } from '@/lib/api'
 import { toast } from 'sonner'
 
 export default function VideoInfo() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { startDownload } = useDownload()
   const [selectedFormat, setSelectedFormat] = useState<string | null>(null)
-  const [downloading, setDownloading] = useState(false)
   const [done, setDone] = useState(false)
   const [imgError, setImgError] = useState(false)
 
@@ -49,25 +46,23 @@ export default function VideoInfo() {
     return `${m}:${String(sec).padStart(2, '0')}`
   }
 
-  const handleDownload = async () => {
+  const handleDownload = () => {
     if (!selectedFormat) return
-    setDownloading(true)
-    try {
-      const format = video.formats.find(f => f.id === selectedFormat)
-      const downloadFormatId = format?.type === 'video-only'
-        ? `${selectedFormat}+bestaudio[ext=m4a]/bestaudio`
-        : selectedFormat
+    const format = video.formats.find(f => f.id === selectedFormat)
+    const downloadFormatId = format?.type === 'video-only'
+      ? `${selectedFormat}+bestaudio[ext=m4a]/bestaudio`
+      : selectedFormat
 
-      // Server-side download: yt-dlp saves to server temp dir, progress shown on /downloads
-      await startDownload(video.webpageUrl, downloadFormatId)
+    // Direct streaming: yt-dlp stdout 直接流到浏览器，服务器只做中转不落盘
+    const a = document.createElement('a')
+    a.href = api.getStreamUrl(video.webpageUrl, downloadFormatId)
+    a.download = ''
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
 
-      setDone(true)
-      toast.success('下载已开始，可前往下载管理查看进度')
-    } catch (err) {
-      toast.error((err as Error).message || '下载失败')
-    } finally {
-      setDownloading(false)
-    }
+    setDone(true)
+    toast.success('已开始下载，文件将保存到浏览器下载目录')
   }
 
   return (
@@ -154,20 +149,15 @@ export default function VideoInfo() {
           {/* Download button */}
           <button
             onClick={handleDownload}
-            disabled={!selectedFormat || downloading}
+            disabled={!selectedFormat}
             className="w-full h-11 rounded-xl bg-ocean-400 hover:bg-ocean-500 text-white
                        font-medium text-sm flex items-center justify-center gap-2 transition-all duration-200
                        disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-ocean-400/20"
           >
-            {downloading ? (
-              <>
-                <Loader2 size={16} className="animate-spin" />
-                开始下载中…
-              </>
-            ) : done ? (
+            {done ? (
               <>
                 <Check size={16} />
-                已添加到下载列表
+                已开始下载
               </>
             ) : (
               <>
