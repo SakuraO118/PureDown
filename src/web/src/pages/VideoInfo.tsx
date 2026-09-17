@@ -18,7 +18,7 @@ export default function VideoInfo() {
   const raw = sessionStorage.getItem(`video-${id}`)
   if (!raw) {
     return (
-      <div className="max-w-5xl mx-auto p-6">
+      <div className="p-6">
         <EmptyState
           icon={ArrowLeft}
           title="视频信息已过期"
@@ -65,8 +65,31 @@ export default function VideoInfo() {
     toast.success('已开始下载，文件将保存到浏览器下载目录')
   }
 
+  const handleDownloadImage = async () => {
+    if (!video.thumbnail) return
+    try {
+      const res = await fetch(api.proxyImage(video.thumbnail))
+      if (!res.ok) throw new Error('fetch failed')
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      const extMatch = video.thumbnail.match(/\.(jpe?g|png|gif|webp)(\?|$)/i)
+      const ext = extMatch ? extMatch[1].toLowerCase() : 'jpg'
+      const safeTitle = video.title.replace(/[\/\\:*?"<>|]/g, '_').substring(0, 60)
+      a.download = `${safeTitle}_封面.${ext}`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+      toast.success('封面图已开始下载')
+    } catch {
+      toast.error('封面图下载失败')
+    }
+  }
+
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <div className="p-6">
       {/* Breadcrumb */}
       <button
         onClick={() => navigate('/')}
@@ -75,22 +98,34 @@ export default function VideoInfo() {
         <ArrowLeft size={14} /> 返回
       </button>
 
-      <div className="flex flex-col sm:flex-row gap-6">
+      <div className="flex flex-col sm:flex-row justify-center gap-6">
         {/* Thumbnail */}
         {video.thumbnail && !imgError ? (
-          <img
-            src={api.proxyImage(video.thumbnail)}
-            alt={video.title}
-            onError={() => setImgError(true)}
-            className="w-full sm:w-96 rounded-2xl shadow-card object-contain shrink-0 sm:self-start bg-white/20"
-          />
+          <div className="relative w-full sm:w-[1000px] shrink-0 sm:self-start">
+            <img
+              src={api.proxyImage(video.thumbnail)}
+              alt={video.title}
+              onError={() => setImgError(true)}
+              className="w-full sm:h-[561px] rounded-2xl shadow-card object-contain bg-white/20"
+            />
+            <button
+              onClick={handleDownloadImage}
+              title="下载封面图"
+              className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-xl
+                         bg-white/75 backdrop-blur-md border border-white/40 text-ink-600
+                         hover:bg-white/95 hover:text-ink-800 text-xs font-medium shadow-card transition-all"
+            >
+              <Download size={14} />
+              下载封面
+            </button>
+          </div>
         ) : (
           <div className="w-full sm:w-96 h-56 rounded-2xl bg-white/30 flex items-center justify-center shrink-0 sm:self-start">
             <span className="text-ink-400 text-sm">{video.thumbnail ? '封面加载失败' : '无封面'}</span>
           </div>
         )}
 
-        <div className="flex-1 min-w-0 max-w-lg">
+        <div className="flex-none w-[512px]">
           {/* Title */}
           <h1 className="font-display text-xl font-medium text-ink-800 leading-snug mb-3">
             {video.title}

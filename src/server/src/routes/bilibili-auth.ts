@@ -1,7 +1,8 @@
 import type { FastifyInstance } from 'fastify'
 import { request as httpRequest } from 'https'
-import { writeFileSync, existsSync, mkdirSync } from 'fs'
+import { writeFileSync, existsSync, mkdirSync, unlinkSync } from 'fs'
 import { join, dirname } from 'path'
+import QRCode from 'qrcode'
 import { downloadManager } from '../services/download-manager.js'
 
 const BILIBILI_API = 'passport.bilibili.com'
@@ -33,9 +34,12 @@ export async function bilibiliAuthRoutes(app: FastifyInstance) {
       if (result.code !== 0) {
         return reply.status(500).send({ error: result.message || '生成二维码失败' })
       }
+      // 本地生成二维码（data URL），避免依赖第三方 api.qrserver.com
+      const qrcode = await QRCode.toDataURL(result.data.url, { width: 240, margin: 1 })
       return reply.send({
         url: result.data.url,
         qrcode_key: result.data.qrcode_key,
+        qrcode,
       })
     } catch (err) {
       return reply.status(500).send({ error: '无法连接 Bilibili' })
@@ -81,6 +85,17 @@ export async function bilibiliAuthRoutes(app: FastifyInstance) {
   app.get('/api/bilibili/status', async (_req, reply) => {
     const cookiePath = getCookiePath()
     return reply.send({ loggedIn: existsSync(cookiePath), cookiePath })
+  })
+
+  // Logout — remove saved cookies
+  app.post('/api/bilibili/logout', async (_req, reply) => {
+    try {
+      const cookiePath = getCookiePath()
+      if (existsSync(cookiePath)) unlinkSync(cookiePath)
+      return reply.send({ loggedIn: false })
+    } catch (err) {
+      return reply.status(500).send({ error: '退出登录失败' })
+    }
   })
 }
 

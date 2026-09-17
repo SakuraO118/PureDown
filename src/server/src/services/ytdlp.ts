@@ -3,7 +3,40 @@ import { createRequire } from 'node:module'
 import type { VideoInfo, FormatOption, PlaylistEntry } from '@puredown/shared'
 import { existsSync, accessSync, constants } from 'fs'
 
-const YT_DLP = 'yt-dlp'
+// yt-dlp 可执行文件解析（三级回退）：
+// 1. YT_DLP_PATH 环境变量（显式指定，可写入 .env）
+// 2. WorkBuddy 托管 Python venv（含 curl_cffi，支持 --impersonate 绕过 B 站 412 风控）
+// 3. 系统 PATH（brew 等）
+const YT_DLP = resolveYtDlp()
+
+// TLS 指纹伪装（--impersonate）：绕过 B 站 412 风控。
+// 前提：yt-dlp 只认 curl_cffi 0.10~0.15（源码写死拒绝 0.16）。Python 3.14 上 0.15 无可用 wheel，
+// 需 Python <=3.13；Alpine/Debian 的 Python 3.11/3.12 有 musllinux/manylinux 的 abi3 wheel 可直接装。
+// 仅对 B 站生效，避免影响其他站点。
+const IMPERSONATE = process.env.YTDLP_IMPERSONATE || 'chrome-136'
+
+// 仅对 B 站启用 --impersonate（412 由 TLS 指纹 WAF 触发）
+function impersonateArgs(url?: string): string[] {
+  if (!IMPERSONATE || !url) return []
+  if (detectSite(url) !== 'bilibili') return []
+  return ['--impersonate', IMPERSONATE]
+}
+
+function resolveYtDlp(): string {
+  const envPath = process.env.YT_DLP_PATH
+  if (envPath && existsSync(envPath)) return envPath
+
+  const home = process.env.HOME || process.env.USERPROFILE || ''
+  const candidates = [
+    home ? `${home}/.workbuddy/binaries/python/envs/default/bin/yt-dlp` : '',
+  ].filter(Boolean) as string[]
+  for (const p of candidates) {
+    if (existsSync(p)) return p
+  }
+
+  return 'yt-dlp'
+}
+
 const require = createRequire(import.meta.url)
 
 // Cookie file support (for Bilibili anti-bot bypass on datacenter IPs)
@@ -218,7 +251,7 @@ export function download(
     delete cleanEnv.no_proxy
 
     const proxyArgs = (PROXY_URL && NEEDS_PROXY(url)) ? ['--proxy', PROXY_URL] : []
-    const finalArgs = [...proxyArgs, ...args]
+    const finalArgs = [...proxyArgs, ...impersonateArgs(url), ...args]
 
     const proc = spawn(YT_DLP, finalArgs, {
       stdio: ['ignore', 'pipe', 'pipe'],

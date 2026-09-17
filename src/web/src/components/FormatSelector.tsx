@@ -24,14 +24,28 @@ function formatSize(bytes: number): string {
 }
 
 function formatAudioQuality(f: FormatOption): string {
-  if (f.asr > 0) return `${(f.asr / 1000).toFixed(1)}kHz`
-  if (f.abr > 0) return `${Math.round(f.abr)}kbps`
-  return ''
+  const parts: string[] = []
+  if (f.abr > 0) parts.push(`${Math.round(f.abr)} kbps`)
+  if (f.asr > 0) parts.push(`${(f.asr / 1000).toFixed(1)} kHz`)
+  if (parts.length > 0) return parts.join(' · ')
+  if (f.note && f.note !== 'audio only') return f.note
+  return 'audio only'
+}
+
+// 音频质量排序：码率(abr) → 采样率(asr) → 文件大小，从高到低
+function sortAudioByQuality(list: FormatOption[]): FormatOption[] {
+  return [...list].sort((a, b) => {
+    const abrDiff = (b.abr || 0) - (a.abr || 0)
+    if (abrDiff !== 0) return abrDiff
+    const asrDiff = (b.asr || 0) - (a.asr || 0)
+    if (asrDiff !== 0) return asrDiff
+    return (b.filesize || 0) - (a.filesize || 0)
+  })
 }
 
 export function FormatSelector({ formats, selected, onSelect }: Props) {
   const videoFormats = formats.filter(f => f.type !== 'audio-only')
-  const audioFormats = formats.filter(f => f.type === 'audio-only')
+  const audioFormats = sortAudioByQuality(formats.filter(f => f.type === 'audio-only'))
 
   // Deduplicate by height, keep first (best quality)
   const seen = new Set<number>()

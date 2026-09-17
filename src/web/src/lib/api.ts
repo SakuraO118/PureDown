@@ -35,4 +35,6 @@ export const api = {
   getStreamUrl: (url: string, formatId: string) =>
     `/api/download/stream?url=${encodeURIComponent(url)}&formatId=${encodeURIComponent(formatId)}`,
   proxyImage: (url: string) => `/api/proxy-image?url=${encodeURIComponent(url)}`,
+  getBilibiliStatus: () => get<{ loggedIn: boolean; cookiePath: string }>('/bilibili/status'),
+  bilibiliLogout: () => post<{ loggedIn: boolean }>('/bilibili/logout', {}),
 }

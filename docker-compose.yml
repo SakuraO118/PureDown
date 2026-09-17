@@ -10,6 +10,8 @@ services:
     environment:
       - DOWNLOAD_DIR=/data/downloads
       - COOKIES_FILE=/data/cookies.txt
+      # B 站 412 风控绕过（镜像内 curl_cffi 已 pin <0.16）
+      - YTDLP_IMPERSONATE=chrome-136
       # ---- 代理（仅 YouTube 走代理，Bilibili 直连） ----
       # - PROXY_URL=http://host.docker.internal:7890
     restart: unless-stopped

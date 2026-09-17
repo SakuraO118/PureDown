@@ -5,11 +5,13 @@ import Home from '@/pages/Home'
 import VideoInfo from '@/pages/VideoInfo'
 import Downloads from '@/pages/Downloads'
 import Settings from '@/pages/Settings'
+import { VisualEditor } from '@/visual-editor/VisualEditor'
 
 export default function App() {
   return (
     <div className="h-screen flex overflow-hidden">
       <Sidebar />
+      {import.meta.env.DEV && <VisualEditor />}
       <main className="flex-1 overflow-y-auto">
         <ErrorBoundary>
           <Routes>

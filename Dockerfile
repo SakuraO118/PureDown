@@ -1,8 +1,11 @@
 FROM node:22-alpine
 
 # System dependencies: yt-dlp + ffmpeg
+# curl_cffi 必须 pin <0.16：yt-dlp 只支持 curl_cffi 0.10~0.15，
+# 不 pin 会装到 0.16.x，导致 --impersonate（绕过 B 站 412 风控）失效。
+# Alpine(musl) 有 cp310-abi3 的 musllinux wheel，Python 3.11/3.12 直接可装。
 RUN apk add --no-cache ffmpeg python3 py3-pip && \
-    pip3 install --break-system-packages -U yt-dlp
+    pip3 install --break-system-packages -U yt-dlp 'curl_cffi>=0.10,<0.16'
 
 WORKDIR /app
 

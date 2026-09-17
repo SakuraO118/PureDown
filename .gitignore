@@ -9,6 +9,10 @@ CLAUDE.md
 .env
 vision.js
 DEPLOY.md
+AGENTS.md
+.workbuddy
 
-
+# 本地可视化编辑器脚手架（仅本地调试，不入库/不进生产）
+src/web/src/visual-editor/
+src/web/src/dev-overrides.css
 

@@ -1,15 +1,17 @@
 import { useState, useEffect, useCallback } from 'react'
-import { QrCode, Loader2, Check, X } from 'lucide-react'
+import { createPortal } from 'react-dom'
+import { Loader2, Check, X } from 'lucide-react'
 
 interface Props {
   open: boolean
   onClose: () => void
+  onSuccess?: () => void
 }
 
-export function BilibiliLogin({ open, onClose }: Props) {
+export function BilibiliLogin({ open, onClose, onSuccess }: Props) {
   const [step, setStep] = useState<'loading' | 'qrcode' | 'scanned' | 'success' | 'expired' | 'error'>('loading')
   const [qrcodeKey, setQrcodeKey] = useState('')
-  const [qrcodeUrl, setQrcodeUrl] = useState('')
+  const [qrcode, setQrcode] = useState('')
   const [message, setMessage] = useState('')
 
   const startLogin = useCallback(async () => {
@@ -19,7 +21,7 @@ export function BilibiliLogin({ open, onClose }: Props) {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
       setQrcodeKey(data.qrcode_key)
-      setQrcodeUrl(data.url)
+      setQrcode(data.qrcode)
       setStep('qrcode')
     } catch (err) {
       setMessage((err as Error).message || '生成二维码失败')
@@ -40,6 +42,7 @@ export function BilibiliLogin({ open, onClose }: Props) {
           setStep('success')
           setMessage(data.message || '登录成功')
           clearInterval(timer)
+          onSuccess?.()
         } else if (data.status === 'scanned') {
           setStep('scanned')
           setMessage('已扫码，请在手机上确认')
@@ -56,9 +59,17 @@ export function BilibiliLogin({ open, onClose }: Props) {
 
   useEffect(() => { if (open) startLogin() }, [open])
 
+  // 登录成功后短暂展示提示，再自动关闭
+  useEffect(() => {
+    if (step !== 'success') return
+    const timer = setTimeout(() => onClose(), 1500)
+    return () => clearTimeout(timer)
+  }, [step, onClose])
+
   if (!open) return null
 
-  return (
+  // 通过 Portal 挂载到 body，避免侧边栏 backdrop-blur 的包含块把 fixed 弹窗压缩
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
@@ -88,7 +99,7 @@ export function BilibiliLogin({ open, onClose }: Props) {
             <>
               <div className="relative">
                 <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrcodeUrl)}`}
+                  src={qrcode}
                   alt="Bilibili 登录二维码"
                   className="w-48 h-48 rounded-xl"
                 />
@@ -143,6 +154,7 @@ export function BilibiliLogin({ open, onClose }: Props) {
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

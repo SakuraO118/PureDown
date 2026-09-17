@@ -6,6 +6,11 @@ import { Toaster } from 'sonner'
 import App from './App'
 import './index.css'
 
+// 可视化编辑器的样式覆盖：仅开发环境加载，生产构建不打包
+if (import.meta.env.DEV) {
+  void import('./dev-overrides.css')
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: 1, staleTime: 10_000 },
