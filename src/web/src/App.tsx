@@ -5,6 +5,10 @@ import Home from '@/pages/Home'
 import VideoInfo from '@/pages/VideoInfo'
 import Downloads from '@/pages/Downloads'
 import Settings from '@/pages/Settings'
+import DownloadHome from '@/pages/DownloadHome'
+import Summarize from '@/pages/Summarize'
+import Analyses from '@/pages/Analyses'
+import AnalysisDetail from '@/pages/AnalysisDetail'
 import { VisualEditor } from '@/visual-editor/VisualEditor'
 
 export default function App() {
@@ -16,15 +20,19 @@ export default function App() {
         <ErrorBoundary>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/download" element={<DownloadHome />} />
             <Route path="/video/:id" element={<VideoInfo />} />
             <Route path="/downloads" element={<Downloads />} />
+            <Route path="/summarize" element={<Summarize />} />
+            <Route path="/analyses" element={<Analyses />} />
+            <Route path="/analyses/:id" element={<AnalysisDetail />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
         </ErrorBoundary>
       </main>
       {/* Version — fixed bottom-right */}
       <p className="fixed bottom-3 right-4 text-[11px] text-ink-400/60 select-none pointer-events-none z-50">
-        v0.1.0
+        v0.2.0
       </p>
     </div>
   )

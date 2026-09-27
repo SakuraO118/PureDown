@@ -1,115 +1,28 @@
-import { useState, useEffect, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ClipboardPaste, Loader2, ArrowRight } from 'lucide-react'
-import { useParseUrl } from '@/hooks/useParseUrl'
-import { cn } from '@/lib/utils'
+import { ArrowRight, Download, Sparkles } from 'lucide-react'
+import { Link } from 'react-router-dom'
+
+const tools = [
+  { to: '/download', icon: Download, title: '视频下载', description: '解析视频链接，选择画质并保存到本地。' },
+  { to: '/summarize', icon: Sparkles, title: '视频总结', description: '提取时间轴字幕与关键帧，生成结构化 AI 笔记。' },
+]
 
 export default function Home() {
-  const [url, setUrl] = useState('')
-  const navigate = useNavigate()
-  const parse = useParseUrl()
-
-  const handleParse = async () => {
-    if (!url.trim()) return
-    try {
-      const result = await parse.mutateAsync(url.trim())
-      sessionStorage.setItem(`video-${result.video.id}`, JSON.stringify(result.video))
-      navigate(`/video/${result.video.id}`)
-    } catch { /* error shown via toast */ }
-  }
-
-  const handlePaste = useCallback(async () => {
-    try {
-      const text = await navigator.clipboard.readText()
-      if (text) setUrl(text)
-    } catch { /* clipboard not available */ }
-  }, [])
-
-  // Global Ctrl+V paste listener
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'v') {
-        handlePaste()
-      }
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [handlePaste])
-
   return (
-    <div className="max-w-xl mx-auto pt-24 pb-16 px-4">
-      {/* Hero */}
-      <div className="text-center mb-10">
-        <h1 className="font-display text-5xl font-light text-ink-900 tracking-wide mb-3">
-          PureDown
-        </h1>
-        <p className="text-ink-500 text-sm">
-          粘贴视频链接，选择格式，开始下载
-        </p>
+    <div className="max-w-4xl mx-auto px-6 py-20">
+      <div className="text-center mb-12">
+        <h1 className="font-display text-5xl font-light text-ink-900 tracking-wide mb-3">PureDown</h1>
+        <p className="text-ink-500">你的视频工具箱</p>
       </div>
-
-      {/* URL Input */}
-      <div className="flex gap-2 mb-3">
-        <div className="flex-1 relative">
-          <input
-            type="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleParse()}
-            disabled={parse.isPending}
-            placeholder="粘贴 Bilibili / YouTube 视频链接…"
-            className={cn(
-              'w-full h-12 px-4 pr-10 bg-white/75 backdrop-blur-md border rounded-xl text-sm transition-all duration-200',
-              'placeholder:text-ink-400',
-              'focus:outline-none focus:border-ocean-400 focus:ring-2 focus:ring-ocean-400/20 focus:bg-white/90',
-              parse.isError
-                ? 'border-red-300'
-                : 'border-white/30'
-            )}
-          />
-          <button
-            onClick={handlePaste}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-ink-400
-                       hover:text-ink-600 transition-colors"
-            title="粘贴 (Ctrl+V)"
-          >
-            <ClipboardPaste size={18} />
-          </button>
-        </div>
-        <button
-          onClick={handleParse}
-          disabled={parse.isPending || !url.trim()}
-          className={cn(
-            'h-12 px-6 rounded-xl font-medium text-sm flex items-center gap-2 transition-all duration-200 shrink-0',
-            'bg-ocean-400 hover:bg-ocean-500 text-white shadow-md shadow-ocean-400/20',
-            'disabled:opacity-50 disabled:cursor-not-allowed'
-          )}
-        >
-          {parse.isPending ? (
-            <>
-              <Loader2 size={16} className="animate-spin" />
-              解析中…
-            </>
-          ) : (
-            <>
-              解析
-              <ArrowRight size={16} />
-            </>
-          )}
-        </button>
+      <div className="grid md:grid-cols-2 gap-6">
+        {tools.map(({ to, icon: Icon, title, description }) => (
+          <Link key={to} to={to} className="group p-6 bg-white/75 backdrop-blur-lg border border-white/25 rounded-2xl shadow-card hover:bg-white/85 hover:shadow-elevated transition-all">
+            <div className="w-11 h-11 rounded-xl bg-ocean-50/80 text-ocean-500 flex items-center justify-center mb-5"><Icon size={22} /></div>
+            <h2 className="text-xl font-medium text-ink-800 mb-2">{title}</h2>
+            <p className="text-sm leading-6 text-ink-500 min-h-12">{description}</p>
+            <span className="mt-6 inline-flex items-center gap-1 text-sm text-ocean-500">打开工具 <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" /></span>
+          </Link>
+        ))}
       </div>
-
-      {/* Error */}
-      {parse.isError && (
-        <p className="text-sm text-red-500 mb-3">
-          {(parse.error as Error)?.message || '解析失败，请检查链接是否正确'}
-        </p>
-      )}
-
-      {/* Supported sites hint */}
-      <p className="text-xs text-ink-400 text-center mt-6">
-        支持 Bilibili · YouTube · 以及 yt-dlp 兼容的所有站点
-      </p>
     </div>
   )
 }

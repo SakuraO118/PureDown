@@ -2,13 +2,16 @@
   "name": "puredown",
   "private": true,
   "scripts": {
-    "dev": "pnpm --parallel -r dev",
-    "dev:server": "pnpm --filter @puredown/server dev",
+    "dev": "concurrently -k -n backend,web \"pnpm dev:server\" \"pnpm dev:web\"",
+    "dev:server": "uv run --project src/backend uvicorn app.main:app --app-dir src/backend --host 0.0.0.0 --port 3001 --reload",
     "dev:web": "pnpm --filter @puredown/web dev",
-    "build": "pnpm -r build",
-    "lint": "pnpm -r lint"
+    "build": "pnpm --filter @puredown/shared build && pnpm --filter @puredown/web build",
+    "lint": "pnpm --filter @puredown/shared lint && pnpm --filter @puredown/web lint && uv run --project . --directory src/backend --extra dev ruff check app tests && uv run --project . --directory src/backend --extra dev mypy app",
+    "test": "uv run --project src/backend --extra dev pytest -q src/backend/tests && pnpm --filter @puredown/web test",
+    "api:types": "uv run --project src/backend python src/backend/scripts/export_openapi.py && openapi-typescript src/backend/openapi.json -o src/shared/src/api.generated.ts"
   },
-  "dependencies": {
-    "dotenv": "^17.4.2"
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "openapi-typescript": "^7.10.1"
   }
 }

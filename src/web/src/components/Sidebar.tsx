@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { NavLink } from 'react-router-dom'
-import { Home, Download, Settings, LogIn } from 'lucide-react'
+import { Home, Download, Settings, LogIn, Sparkles, History } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { api } from '@/lib/api'
@@ -8,7 +8,10 @@ import { BilibiliLogin } from './BilibiliLogin'
 
 const navItems = [
   { to: '/', icon: Home, label: '首页' },
-  { to: '/downloads', icon: Download, label: '下载' },
+  { to: '/download', icon: Download, label: '视频下载' },
+  { to: '/summarize', icon: Sparkles, label: '视频总结' },
+  { to: '/analyses', icon: History, label: '分析历史' },
+  { to: '/downloads', icon: Download, label: '下载记录' },
   { to: '/settings', icon: Settings, label: '设置' },
 ]
 

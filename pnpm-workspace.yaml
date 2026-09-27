@@ -1,5 +1,6 @@
 packages:
-  - 'src/*'
+  - 'src/shared'
+  - 'src/web'
 allowBuilds:
   esbuild: true
-  ffmpeg-static: true
+  ffmpeg-static: false

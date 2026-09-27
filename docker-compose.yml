@@ -4,14 +4,22 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - ./downloads:/data/downloads
+      - ./data:/data
       # B站 Cookie（扫码登录自动保存，也可手动替换）
       - ./cookies.txt:/data/cookies.txt
     environment:
       - DOWNLOAD_DIR=/data/downloads
+      - DATA_DIR=/data
       - COOKIES_FILE=/data/cookies.txt
       # B 站 412 风控绕过（镜像内 curl_cffi 已 pin <0.16）
       - YTDLP_IMPERSONATE=chrome-136
+      - WHISPER_MODE=disabled
+      - ANALYSIS_MAX_CONCURRENCY=2
+      - PLAYLIST_MAX_ITEMS=20
+      # OpenAI-compatible 总结服务（仅服务端读取）
+      # - LLM_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
+      # - LLM_API_KEY=your-key
+      # - LLM_MODEL=qwen-plus
       # ---- 代理（仅 YouTube 走代理，Bilibili 直连） ----
       # - PROXY_URL=http://host.docker.internal:7890
     restart: unless-stopped

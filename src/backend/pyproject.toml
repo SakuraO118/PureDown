@@ -1,0 +1,44 @@
+[project]
+name = "puredown-backend"
+version = "0.2.0"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+  "alembic>=1.14,<2",
+  "curl-cffi>=0.10,<0.16",
+  "fastapi>=0.115,<1",
+  "httpx>=0.28,<1",
+  "openai>=1.60,<2",
+  "pillow>=11,<12",
+  "pydantic-settings>=2.7,<3",
+  "qrcode>=8,<9",
+  "sqlalchemy>=2.0,<3",
+  "uvicorn[standard]>=0.34,<1",
+  "youtube-transcript-api>=1,<2",
+  "yt-dlp>=2025.1",
+]
+
+[project.optional-dependencies]
+whisper = ["faster-whisper>=1.1,<2"]
+dev = [
+  "mypy>=1.14,<2",
+  "pytest>=8.3,<9",
+  "pytest-asyncio>=0.25,<1",
+  "ruff>=0.9,<1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+ignore_missing_imports = true

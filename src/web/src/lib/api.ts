@@ -1,4 +1,4 @@
-import type { ParseResponse, DownloadResponse, DownloadTask } from '@puredown/shared'
+import type { Analysis, AnalysisConfigStatus, AnalysisPreview, DownloadResponse, DownloadTask, ParseResponse, TranscriptSegment } from '@puredown/shared'
 
 const BASE = '/api'
 
@@ -10,7 +10,7 @@ async function post<T>(path: string, body: unknown): Promise<T> {
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }))
-    throw new Error(err.error || 'Request failed')
+    throw new Error(err.error || err.detail || 'Request failed')
   }
   return res.json()
 }
@@ -19,7 +19,7 @@ async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`)
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }))
-    throw new Error(err.error || 'Request failed')
+    throw new Error(err.error || err.detail || 'Request failed')
   }
   return res.json()
 }
@@ -37,4 +37,18 @@ export const api = {
   proxyImage: (url: string) => `/api/proxy-image?url=${encodeURIComponent(url)}`,
   getBilibiliStatus: () => get<{ loggedIn: boolean; cookiePath: string }>('/bilibili/status'),
   bilibiliLogout: () => post<{ loggedIn: boolean }>('/bilibili/logout', {}),
+  previewAnalysis: (url: string) => post<AnalysisPreview>('/analysis/preview', { url }),
+  createAnalysis: (url: string, generatePlaylistOverview: boolean) =>
+    post<Analysis>('/analyses', { url, generatePlaylistOverview }),
+  getAnalyses: () => get<Analysis[]>('/analyses'),
+  getAnalysis: (id: string) => get<Analysis>(`/analyses/${id}`),
+  getTranscript: (analysisId: string, itemId: string) =>
+    get<TranscriptSegment[]>(`/analyses/${analysisId}/items/${itemId}/transcript`),
+  retryAnalysisItem: (analysisId: string, itemId: string) =>
+    post<Analysis>(`/analyses/${analysisId}/items/${itemId}/retry`, {}),
+  getConfigStatus: () => get<AnalysisConfigStatus>('/config/status'),
+  analysisWebSocketUrl: (id: string) => {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    return `${protocol}//${window.location.host}/ws/analyses/${id}`
+  },
 }

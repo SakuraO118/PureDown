@@ -25,7 +25,7 @@ export default function VideoInfo() {
           description="请返回首页重新解析视频链接"
           action={
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/download')}
               className="px-4 py-2 text-sm rounded-xl bg-ocean-400 hover:bg-ocean-500 text-white transition-colors shadow-md shadow-ocean-400/20"
             >
               返回首页
@@ -92,7 +92,7 @@ export default function VideoInfo() {
     <div className="p-6">
       {/* Breadcrumb */}
       <button
-        onClick={() => navigate('/')}
+        onClick={() => navigate('/download')}
         className="inline-flex items-center gap-1 text-sm text-ink-500 hover:text-ink-700 transition-colors mb-6"
       >
         <ArrowLeft size={14} /> 返回

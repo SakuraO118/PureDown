@@ -1,3 +1,5 @@
+import type { components as ApiComponents } from './api.generated'
+
 // ---- Video Info (from yt-dlp --dump-json) ----
 
 export interface FormatOption {
@@ -91,3 +93,19 @@ export type WsMessage =
   | { type: 'progress'; data: DownloadProgress }
   | { type: 'complete'; data: { taskId: string; filePath: string; filename: string } }
   | { type: 'error'; data: { taskId: string; error: string } }
+
+export type AnalysisStatus = ApiComponents['schemas']['AnalysisStatus']
+export type TranscriptSegment = ApiComponents['schemas']['TranscriptSegment']
+export type AnalysisFrame = ApiComponents['schemas']['FrameInfo']
+export interface SummaryChapter extends Omit<ApiComponents['schemas']['SummaryChapter'], 'keyPoints'> { keyPoints: string[] }
+export interface VideoSummary extends Omit<ApiComponents['schemas']['VideoSummary'], 'chapters' | 'highlights' | 'questions'> {
+  chapters: SummaryChapter[]
+  highlights: Array<{ text: string; tags: string[] }>
+  questions: string[]
+}
+export interface PlaylistOverview extends Omit<ApiComponents['schemas']['PlaylistOverview'], 'themes' | 'sequence' | 'omittedItems'> { themes: string[]; sequence: string[]; omittedItems: string[] }
+export type AnalysisPreviewEntry = ApiComponents['schemas']['PreviewEntry']
+export interface AnalysisPreview extends Omit<ApiComponents['schemas']['AnalysisPreview'], 'kind' | 'entries'> { kind: 'single' | 'playlist'; entries: AnalysisPreviewEntry[] }
+export interface AnalysisItem extends Omit<ApiComponents['schemas']['AnalysisItemResponse'], 'summary' | 'frames'> { summary?: VideoSummary | null; frames: AnalysisFrame[] }
+export interface Analysis extends Omit<ApiComponents['schemas']['AnalysisResponse'], 'kind' | 'items' | 'playlistOverview'> { kind: 'single' | 'playlist'; items: AnalysisItem[]; playlistOverview?: PlaylistOverview | null }
+export type AnalysisConfigStatus = ApiComponents['schemas']['ConfigStatus']
